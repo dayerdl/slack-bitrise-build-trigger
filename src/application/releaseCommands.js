@@ -4,15 +4,21 @@ import {
   deleteReleaseFromTsvContent,
   parsePipeKeyValues,
   ReleaseMutationError,
+  resolveClientNameForTsv,
 } from "../domain/releaseMutation.js";
 import { createReleaseDataStore } from "../infrastructure/releaseDataStore.js";
 
 export { ReleaseMutationError } from "../domain/releaseMutation.js";
 
 function ensureCanPersistReleases() {
-  if (process.env.VERCEL === "1" && !String(process.env.GITHUB_TOKEN ?? "").trim()) {
+  if (process.env.VERCEL !== "1") {
+    return;
+  }
+  const token = String(process.env.GITHUB_TOKEN ?? "").trim();
+  const repo = String(process.env.GITHUB_REPOSITORY ?? "").trim();
+  if (!token || !repo) {
     throw new ReleaseMutationError(
-      "On Vercel, set `GITHUB_TOKEN` and `GITHUB_REPOSITORY` to add or delete releases (contents:write on the repo). See `.env.example`."
+      "On Vercel the filesystem is read-only. Set both `GITHUB_TOKEN` (contents:write on the repo) and `GITHUB_REPOSITORY` (e.g. `dayerdl/slack-bitrise-build-trigger`), then redeploy. See `.env.example`."
     );
   }
 }

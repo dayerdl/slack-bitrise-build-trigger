@@ -15,6 +15,12 @@ export function createReleaseDataStore() {
   const branch = String(process.env.GITHUB_RELEASE_BRANCH ?? "main").trim();
   const pathInRepo = String(process.env.RELEASE_TSV_PATH ?? "data/client-releases.tsv").trim();
 
+  if (process.env.VERCEL === "1" && (!token || !repoFull)) {
+    throw new Error(
+      "Vercel filesystem is read-only. Set `GITHUB_TOKEN` and `GITHUB_REPOSITORY` so releases are saved via the GitHub API."
+    );
+  }
+
   if (token && repoFull) {
     const [owner, repo] = splitRepo(repoFull);
     if (!owner || !repo) {
