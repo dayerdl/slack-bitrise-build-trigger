@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { groupReleasesByClient, parseClientReleasesTsv } from "./clientReleases.js";
+import {
+  filterRowsByClientQuery,
+  groupReleasesByClient,
+  parseClientReleasesTsv,
+} from "./clientReleases.js";
 
 test("parses TSV rows", () => {
   const rows = parseClientReleasesTsv(`client	version	date	env	status	notes
@@ -23,4 +27,17 @@ Aardvark	1.0.0	2025-03-01	stage	r	`);
 
   assert.deepEqual(clients, ["Aardvark", "Zoo"]);
   assert.equal(byClient.get("Zoo")[0].version, "2.0.0");
+});
+
+test("filterRowsByClientQuery exact then partial", () => {
+  const rows = parseClientReleasesTsv(`client	version	date	env	status	notes
+Foo Bar	1.0.0	2025-01-01	prod	r	
+Foo Baz	2.0.0	2025-02-01	prod	r	`);
+
+  const exact = filterRowsByClientQuery(rows, "Foo Bar");
+  assert.equal(exact.length, 1);
+  assert.equal(exact[0].client, "Foo Bar");
+
+  const partial = filterRowsByClientQuery(rows, "Foo");
+  assert.equal(partial.length, 2);
 });

@@ -2,6 +2,8 @@ const LIST_KEYWORDS = new Set(["list", "clients", "versions"]);
 
 /**
  * Parse slash-command text (Slack omits the `/flutter-build` prefix in `text`).
+ *
+ * List mode: `list`, `list all`, `list Bergen Town Centre` (client name / partial after the keyword).
  */
 export function parseFlutterBuildIntent(text) {
   const normalized = String(text ?? "")
@@ -20,7 +22,11 @@ export function parseFlutterBuildIntent(text) {
   }
 
   if (LIST_KEYWORDS.has(firstWord)) {
-    return { type: "list" };
+    const afterKeyword = normalized.replace(/^(list|clients|versions)\s*/i, "").trim();
+    const listAll =
+      !afterKeyword || afterKeyword.toLowerCase() === "all";
+    const clientQuery = listAll ? null : afterKeyword;
+    return { type: "list", clientQuery };
   }
 
   return { type: "build" };

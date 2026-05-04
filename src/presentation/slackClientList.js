@@ -4,11 +4,17 @@ const SLACK_TEXT_SAFE_LIMIT = 3500;
 
 /**
  * Ephemeral mrkdwn payload listing clients and all known versions (from TSV).
+ * @param {{ clientQuery?: string | null }} [options]
  */
-export function buildClientListPayload(rows) {
+export function buildClientListPayload(rows, options = {}) {
+  const { clientQuery } = options;
   const { clients, byClient } = groupReleasesByClient(rows);
 
-  const lines = ["*Client builds*", "_From `data/client-releases.tsv`_\n"];
+  const meta = clientQuery
+    ? `_Filter: \`${escapeMrkdwn(clientQuery)}\` · from \`data/client-releases.tsv\`_`
+    : `_From \`data/client-releases.tsv\`_`;
+
+  const lines = ["*Client builds*", meta, ""];
 
   for (const client of clients) {
     const releases = byClient.get(client) ?? [];

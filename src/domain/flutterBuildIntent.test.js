@@ -4,13 +4,32 @@ import test from "node:test";
 import { parseFlutterBuildIntent } from "./flutterBuildIntent.js";
 
 test("list intent from first word", () => {
-  assert.equal(parseFlutterBuildIntent("list").type, "list");
-  assert.equal(parseFlutterBuildIntent("clients").type, "list");
-  assert.equal(parseFlutterBuildIntent("versions").type, "list");
+  assert.deepEqual(parseFlutterBuildIntent("list"), { type: "list", clientQuery: null });
+  assert.deepEqual(parseFlutterBuildIntent("clients"), { type: "list", clientQuery: null });
+  assert.deepEqual(parseFlutterBuildIntent("versions"), { type: "list", clientQuery: null });
+});
+
+test("list all and list with client query", () => {
+  assert.deepEqual(parseFlutterBuildIntent("list all"), { type: "list", clientQuery: null });
+  assert.deepEqual(parseFlutterBuildIntent("list Bergen"), {
+    type: "list",
+    clientQuery: "Bergen",
+  });
+  assert.deepEqual(parseFlutterBuildIntent("list Bergen Town Centre"), {
+    type: "list",
+    clientQuery: "Bergen Town Centre",
+  });
+  assert.deepEqual(parseFlutterBuildIntent("clients wolfsburg"), {
+    type: "list",
+    clientQuery: "wolfsburg",
+  });
 });
 
 test("strips optional /flutter-build prefix", () => {
-  assert.equal(parseFlutterBuildIntent("/flutter-build list").type, "list");
+  assert.deepEqual(parseFlutterBuildIntent("/flutter-build list"), {
+    type: "list",
+    clientQuery: null,
+  });
 });
 
 test("empty when no text", () => {

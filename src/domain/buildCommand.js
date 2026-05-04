@@ -49,7 +49,8 @@ export function buildSlackUsage() {
   return [
     "Usage:",
     "",
-    "• `/flutter-build list` — show all clients and build versions (from `data/client-releases.tsv`).",
+    "• `/flutter-build list` or `/flutter-build list all` — all clients and versions.",
+    "• `/flutter-build list Client Name` or `/flutter-build list bergen` — one client (exact or partial name).",
     "• `/flutter-build workflow:deploy | branch:master | ENV[build_env]:prod | ENV[build_customer]:tanger | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:8.0.18`",
     "",
     "Required for triggers: `workflow`, `branch`, `ENV[build_env]`, `ENV[build_customer]`.",

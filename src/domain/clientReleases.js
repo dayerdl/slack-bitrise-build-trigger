@@ -70,6 +70,25 @@ export function groupReleasesByClient(rows) {
   return { clients, byClient: map };
 }
 
+/**
+ * Filter release rows by client name. Exact case-insensitive match wins; otherwise
+ * any client whose name includes the query (case-insensitive).
+ */
+export function filterRowsByClientQuery(rows, query) {
+  const q = String(query ?? "").trim();
+  if (!q) {
+    return rows;
+  }
+
+  const qLower = q.toLowerCase();
+  const exact = rows.filter((r) => r.client.toLowerCase() === qLower);
+  if (exact.length > 0) {
+    return exact;
+  }
+
+  return rows.filter((r) => r.client.toLowerCase().includes(qLower));
+}
+
 function compareIsoDateDesc(a, b) {
   if (!a && !b) {
     return 0;

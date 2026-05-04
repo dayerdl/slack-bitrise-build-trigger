@@ -5,7 +5,7 @@ import {
   buildSlackUsage,
   parseBuildCommand,
 } from "../src/domain/buildCommand.js";
-import { loadClientReleaseRows } from "../src/domain/clientReleases.js";
+import { filterRowsByClientQuery, loadClientReleaseRows } from "../src/domain/clientReleases.js";
 import { parseFlutterBuildIntent } from "../src/domain/flutterBuildIntent.js";
 import { triggerBitriseBuild } from "../src/infrastructure/bitriseClient.js";
 import { verifySlackSignature } from "../src/infrastructure/slackSignature.js";
@@ -68,8 +68,21 @@ export async function POST(request) {
 
     if (intent.type === "list") {
       try {
-        const rows = loadClientReleaseRows();
-        return jsonResponse(200, buildClientListPayload(rows));
+        const allRows = loadClientReleaseRows();
+        const clientQuery = intent.clientQuery;
+        const rows = clientQuery
+          ? filterRowsByClientQuery(allRows, clientQuery)
+          : allRows;
+        if (clientQuery && rows.length === 0) {
+          return jsonResponse(200, {
+            response_type: "ephemeral",
+            text: `No client matched \`${clientQuery}\`. Try another spelling or a shorter partial name (e.g. \`berg\`, \`village\`).`,
+          });
+        }
+        return jsonResponse(
+          200,
+          buildClientListPayload(rows, { clientQuery })
+        );
       } catch (error) {
         console.error("Failed to load client releases", error);
         return jsonResponse(200, {
