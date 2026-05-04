@@ -11,6 +11,7 @@ Helsinki	2.9.802	2025-11-12	stage	internal review	final pre-launch
 Helsinki	2.9.801	2025-10-24	prod	pre-launch	app-3165; core branding
 LDO / One Wembley Park	2.10.4	2025-10-29	stage	flutter dev	
 Lillenium	2.9.724	2025-11-20	stage		app-3185 ionic→flutter reopened
+Mall of America	0.0.1	2026-05-04	stage	bitrise	Slack build — workflow:deploy branch:development
 Mall of America	4.2.353	2026-03-26	prod	not released yet	app-3477 regression prod resolved
 Mall of America	4.2.351	2026-03-24	stage		app-3436 regression stage resolved
 Mall of America	4.2.326	2025-12-01	prod	released	app-3238 hotfix icons map
@@ -28,6 +29,8 @@ New West End (NWE)	2.9.721	2025-11-06	stage	flutter team
 New West End (NWE)	2.9.712	2025-10-30	stage	flutter team	
 New West End (NWE)	8.28.53	2025-10-14	stage		
 OWA	2.9.725	2025-11-27	stage		app-3213 ionic→flutter blocked
+Sandbox Springs	111.0.0-test	2026-05-04	stage	test	token check
+Sandbox Springs	0.0.0-test	2026-05-04	stage	test	token check
 Sandbox Springs	0.12.0	2025-10-10	stage		
 Turawa Park	2.9.690	2026-03-09	stage	flutter team	app-3426 merge rejected
 Turawa Park	2.9.689	2025-11-05	stage		core build
@@ -38,22 +41,20 @@ VIA BSFO	1.12.42	2025-10-15	stage
 Village Market	2.9.707	2026-04-14	prod		app-3466 smoke prod resolved
 Village Market	2.9.706	2025-11-28	prod	released	
 Village Market	2.9.703	2025-10-22	stage	flutter team	
+Village Market	2.9.703	2025-10-16	prod		
 Village Market	2.9.702	2025-10-15	stage		
 Village Market	2.9.701	2025-10-15	prod		
-Village Market	2.9.703	2025-10-16	prod		
 Village Market Coniq	5.9.591	2025-11-27	stage		
 Village Market Coniq	5.9.588	2025-10-15	stage		
 Village Market Coniq	5.9.587	2025-10-15	stage		
 Village Market Coniq	5.9.586	2025-10-14	stage		
 Village Market Coniq	5.9.585	2025-10-10	stage		
+Villaggio	0.8.33	2026-06-05	prod	released	
 Villaggio	0.8.37	2026-04-29	stage	not for release	SDK/dSYM; theme fix vs 0.8.36
 Villaggio	0.8.36	2026-04-29	stage	rejected	demo theme issue app-3530
 Villaggio	0.8.35	2026-04-15	prod	ios only	
 Villaggio	0.8.34	2026-02-19	stage		
-Villaggio	0.8.33	2026-06-05	prod	released	
 WAFI City / Rewards	2.9.691	2025-10-21	stage	flutter team	
 WAFI City / Rewards	2.9.690	2025-10-16	stage		app-2931 ionic→flutter todo
 Wolfsburg	2.9.805	2026-03-24	stage		app-3453 regression in progress
 Wolfsburg	2.9.718	2025-11-18	stage		
-Sandbox Springs	0.0.0-test	2026-05-04	stage	test	token check
-Sandbox Springs	111.0.0-test	2026-05-04	stage	test	token check
