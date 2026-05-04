@@ -5,6 +5,11 @@ import {
   buildSlackUsage,
   parseBuildCommand,
 } from "../src/domain/buildCommand.js";
+import {
+  executeReleaseAdd,
+  executeReleaseDelete,
+  ReleaseMutationError,
+} from "../src/application/releaseCommands.js";
 import { buildCatalogContext } from "../src/domain/coniqClients.js";
 import { filterRowsByClientQuery, loadClientReleaseRows } from "../src/domain/clientReleases.js";
 import { parseFlutterBuildIntent } from "../src/domain/flutterBuildIntent.js";
@@ -90,6 +95,32 @@ export async function POST(request) {
         return jsonResponse(200, {
           response_type: "ephemeral",
           text: `Could not load release data: ${error.message}`,
+        });
+      }
+    }
+
+    if (intent.type === "release_add" || intent.type === "release_delete") {
+      try {
+        const { slugToTsv } = buildCatalogContext();
+        const text =
+          intent.type === "release_add"
+            ? await executeReleaseAdd(intent.fieldText, slugToTsv)
+            : await executeReleaseDelete(intent.fieldText, slugToTsv);
+        return jsonResponse(200, {
+          response_type: "ephemeral",
+          text,
+        });
+      } catch (error) {
+        if (error instanceof ReleaseMutationError) {
+          return jsonResponse(200, {
+            response_type: "ephemeral",
+            text: error.message,
+          });
+        }
+        console.error("Release mutation failed", error);
+        return jsonResponse(200, {
+          response_type: "ephemeral",
+          text: `Could not update releases: ${error.message}`,
         });
       }
     }

@@ -29,5 +29,29 @@ export function parseFlutterBuildIntent(text) {
     return { type: "list", clientQuery };
   }
 
+  const releaseVerb = normalized.match(/^release\s+(add|delete|remove)\s*(.*)$/is);
+  if (releaseVerb) {
+    const verb = releaseVerb[1].toLowerCase();
+    const fieldText = String(releaseVerb[2] ?? "").trim();
+    if (verb === "add") {
+      return { type: "release_add", fieldText };
+    }
+    return { type: "release_delete", fieldText };
+  }
+
+  if (/^add\s+release\s*/i.test(normalized)) {
+    return {
+      type: "release_add",
+      fieldText: normalized.replace(/^add\s+release\s*/i, "").trim(),
+    };
+  }
+
+  if (/^(delete|remove)\s+release\s*/i.test(normalized)) {
+    return {
+      type: "release_delete",
+      fieldText: normalized.replace(/^(delete|remove)\s+release\s*/i, "").trim(),
+    };
+  }
+
   return { type: "build" };
 }

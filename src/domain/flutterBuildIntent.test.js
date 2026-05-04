@@ -49,3 +49,18 @@ test("build intent for workflow line", () => {
 test("help intent", () => {
   assert.equal(parseFlutterBuildIntent("help").type, "help");
 });
+
+test("release add and delete intent", () => {
+  assert.deepEqual(parseFlutterBuildIntent("release add | client:moa | version:1"), {
+    type: "release_add",
+    fieldText: "| client:moa | version:1",
+  });
+  assert.deepEqual(parseFlutterBuildIntent("release delete | client:moa | version:1"), {
+    type: "release_delete",
+    fieldText: "| client:moa | version:1",
+  });
+  assert.deepEqual(parseFlutterBuildIntent("add release | client:x | version:2"), {
+    type: "release_add",
+    fieldText: "| client:x | version:2",
+  });
+});
