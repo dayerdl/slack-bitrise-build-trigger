@@ -1,0 +1,17 @@
+{
+  "name": "slack-bitrise-build-trigger",
+  "version": "1.0.0",
+  "description": "Vercel Node.js Slack slash command endpoint that triggers Bitrise builds.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "npx vercel dev",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@vercel/functions": "latest"
+  }
+}
