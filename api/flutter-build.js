@@ -38,6 +38,15 @@ export async function POST(request) {
     });
 
     if (!isVerified) {
+      if (!String(process.env.SLACK_SIGNING_SECRET ?? "").trim()) {
+        console.warn(
+          "slack-bitrise: SLACK_SIGNING_SECRET is missing. Add it under Vercel → Production env and redeploy."
+        );
+      } else {
+        console.warn(
+          "slack-bitrise: Slack signature verification failed. Use the Signing Secret from api.slack.com → Your App → Basic Information (no extra spaces). Redeploy after changing env."
+        );
+      }
       return jsonResponse(401, {
         response_type: "ephemeral",
         text: "Slack signature verification failed.",
