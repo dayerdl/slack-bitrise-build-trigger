@@ -5,8 +5,11 @@ import {
   buildSlackUsage,
   parseBuildCommand,
 } from "../src/domain/buildCommand.js";
+import { loadClientReleaseRows } from "../src/domain/clientReleases.js";
+import { parseFlutterBuildIntent } from "../src/domain/flutterBuildIntent.js";
 import { triggerBitriseBuild } from "../src/infrastructure/bitriseClient.js";
 import { verifySlackSignature } from "../src/infrastructure/slackSignature.js";
+import { buildClientListPayload } from "../src/presentation/slackClientList.js";
 import {
   buildAcknowledgementPayload,
   buildBitriseErrorPayload,
@@ -54,6 +57,28 @@ export async function POST(request) {
     }
 
     const slackPayload = Object.fromEntries(new URLSearchParams(rawBody));
+    const intent = parseFlutterBuildIntent(slackPayload.text);
+
+    if (intent.type === "empty" || intent.type === "help") {
+      return jsonResponse(200, {
+        response_type: "ephemeral",
+        text: buildSlackUsage(),
+      });
+    }
+
+    if (intent.type === "list") {
+      try {
+        const rows = loadClientReleaseRows();
+        return jsonResponse(200, buildClientListPayload(rows));
+      } catch (error) {
+        console.error("Failed to load client releases", error);
+        return jsonResponse(200, {
+          response_type: "ephemeral",
+          text: `Could not load release data: ${error.message}`,
+        });
+      }
+    }
+
     const allowedCustomers = parseAllowedCustomers(process.env.ALLOWED_CUSTOMERS);
 
     let command;

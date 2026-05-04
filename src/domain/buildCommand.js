@@ -48,9 +48,11 @@ export function parseBuildCommand(input, options = {}) {
 export function buildSlackUsage() {
   return [
     "Usage:",
-    "`/flutter-build workflow:deploy | branch:master | ENV[build_env]:prod | ENV[build_customer]:tanger | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:8.0.18`",
     "",
-    "Required: `workflow`, `branch`, `ENV[build_env]`, `ENV[build_customer]`.",
+    "• `/flutter-build list` — show all clients and build versions (from `data/client-releases.tsv`).",
+    "• `/flutter-build workflow:deploy | branch:master | ENV[build_env]:prod | ENV[build_customer]:tanger | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:8.0.18`",
+    "",
+    "Required for triggers: `workflow`, `branch`, `ENV[build_env]`, `ENV[build_customer]`.",
     "Allowed `build_env`: `qa`, `pre`, `stage`, `prod`.",
   ].join("\n");
 }
