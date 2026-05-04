@@ -1,3 +1,5 @@
+import { formatClientHelpAppendix } from "./coniqClients.js";
+
 const VALID_BUILD_ENVS = new Set(["qa", "pre", "stage", "prod"]);
 const BOOLEAN_ENV_KEYS = new Set(["build_ios", "build_android"]);
 
@@ -46,16 +48,18 @@ export function parseBuildCommand(input, options = {}) {
 }
 
 export function buildSlackUsage() {
-  return [
-    "Usage:",
-    "",
-    "• `/flutter-build list` or `/flutter-build list all` — all clients and versions.",
-    "• `/flutter-build list Client Name` or `/flutter-build list bergen` — one client (exact or partial name).",
-    "• `/flutter-build workflow:deploy | branch:master | ENV[build_env]:prod | ENV[build_customer]:tanger | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:8.0.18`",
-    "",
-    "Required for triggers: `workflow`, `branch`, `ENV[build_env]`, `ENV[build_customer]`.",
-    "Allowed `build_env`: `qa`, `pre`, `stage`, `prod`.",
-  ].join("\n");
+  return (
+    [
+      "Usage:",
+      "",
+      "• `/flutter-build list` or `/flutter-build list all` — all clients and versions.",
+      "• `/flutter-build list Client Name` or `/flutter-build list bergen` — one client (slug or TSV name).",
+      "• `/flutter-build workflow:deploy | branch:master | ENV[build_env]:prod | ENV[build_customer]:tanger | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:8.0.18`",
+      "",
+      "Required for triggers: `workflow`, `branch`, `ENV[build_env]`, `ENV[build_customer]` (use folder slug when possible).",
+      "Allowed `build_env`: `qa`, `pre`, `stage`, `prod`.",
+    ].join("\n") + formatClientHelpAppendix()
+  );
 }
 
 export function formatCommandSummary(command) {

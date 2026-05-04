@@ -26,3 +26,28 @@ export function buildCatalogContext() {
   const slugToTsv = loadSlugToTsvMap();
   return { slugs, slugToTsv };
 }
+
+/**
+ * Markdown appendix for slash-command help: folder slug and release-table name per client.
+ */
+export function formatClientHelpAppendix() {
+  try {
+    const slugs = loadConiqClientSlugs();
+    const map = loadSlugToTsvMap();
+    if (slugs.length === 0) {
+      return "";
+    }
+
+    const lines = slugs.map((slug) => {
+      const display = map[slug];
+      if (display) {
+        return `• \`${slug}\` — ${display}`;
+      }
+      return `• \`${slug}\` — _(add display name in \`client_slug_to_tsv.json\`)_`;
+    });
+
+    return `\n\n*Clients* _(folder slug → \`client-releases.tsv\` name)_\n${lines.join("\n")}`;
+  } catch {
+    return "";
+  }
+}
