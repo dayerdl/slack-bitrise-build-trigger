@@ -5,6 +5,7 @@ import {
   buildSlackUsage,
   parseBuildCommand,
 } from "../src/domain/buildCommand.js";
+import { buildCatalogContext } from "../src/domain/coniqClients.js";
 import { filterRowsByClientQuery, loadClientReleaseRows } from "../src/domain/clientReleases.js";
 import { parseFlutterBuildIntent } from "../src/domain/flutterBuildIntent.js";
 import { triggerBitriseBuild } from "../src/infrastructure/bitriseClient.js";
@@ -69,19 +70,20 @@ export async function POST(request) {
     if (intent.type === "list") {
       try {
         const allRows = loadClientReleaseRows();
+        const catalog = buildCatalogContext();
         const clientQuery = intent.clientQuery;
         const rows = clientQuery
-          ? filterRowsByClientQuery(allRows, clientQuery)
+          ? filterRowsByClientQuery(allRows, clientQuery, catalog)
           : allRows;
         if (clientQuery && rows.length === 0) {
           return jsonResponse(200, {
             response_type: "ephemeral",
-            text: `No client matched \`${clientQuery}\`. Try another spelling or a shorter partial name (e.g. \`berg\`, \`village\`).`,
+            text: `No client matched \`${clientQuery}\`. Try a Coniq folder slug (e.g. \`moa\`, \`bergen\`) or a TSV client name.`,
           });
         }
         return jsonResponse(
           200,
-          buildClientListPayload(rows, { clientQuery })
+          buildClientListPayload(rows, { clientQuery, catalog })
         );
       } catch (error) {
         console.error("Failed to load client releases", error);

@@ -71,22 +71,88 @@ export function groupReleasesByClient(rows) {
 }
 
 /**
- * Filter release rows by client name. Exact case-insensitive match wins; otherwise
- * any client whose name includes the query (case-insensitive).
+ * Filter release rows by client name. When `catalog` is passed, also matches
+ * Coniq `clients/` folder slugs via `client_slug_to_tsv.json`.
+ *
+ * @param {{ slugs: string[], slugToTsv: Record<string, string | null> }} [catalog]
  */
-export function filterRowsByClientQuery(rows, query) {
+export function filterRowsByClientQuery(rows, query, catalog = null) {
   const q = String(query ?? "").trim();
   if (!q) {
     return rows;
   }
 
   const qLower = q.toLowerCase();
+
+  if (catalog?.slugs?.length && catalog.slugToTsv) {
+    const { slugs, slugToTsv } = catalog;
+
+    const slugExact = slugs.find((s) => s.toLowerCase() === qLower);
+    if (slugExact !== undefined) {
+      const name = slugToTsv[slugExact];
+      if (name) {
+        return rows.filter((r) => r.client === name);
+      }
+      return [];
+    }
+
+    const slugPartials = slugs.filter((s) => s.includes(qLower));
+    if (slugPartials.length > 0) {
+      const names = slugPartials.map((s) => slugToTsv[s]).filter(Boolean);
+      if (names.length > 0) {
+        return rows.filter((r) => names.includes(r.client));
+      }
+      return [];
+    }
+
+    const matchedValues = Object.values(slugToTsv).filter(
+      (v) => v && v.toLowerCase().includes(qLower)
+    );
+    if (matchedValues.length > 0) {
+      return rows.filter((r) => matchedValues.includes(r.client));
+    }
+  }
+
   const exact = rows.filter((r) => r.client.toLowerCase() === qLower);
   if (exact.length > 0) {
     return exact;
   }
 
   return rows.filter((r) => r.client.toLowerCase().includes(qLower));
+}
+
+/**
+ * Order: Coniq folder slugs (sorted), then TSV-only clients not mapped from any slug.
+ */
+export function buildConiqCatalogSections(rows, slugs, slugToTsv) {
+  const { byClient } = groupReleasesByClient(rows);
+  const mappedNames = new Set(
+    Object.values(slugToTsv).filter((v) => typeof v === "string" && v.length > 0)
+  );
+
+  const slugOrder = [...slugs].sort((a, b) => a.localeCompare(b, "en"));
+  const sections = [];
+
+  for (const slug of slugOrder) {
+    const tsvName = slugToTsv[slug];
+    const releaseRows = tsvName ? byClient.get(tsvName) ?? [] : [];
+    sections.push({ kind: "coniq", slug, tsvName: tsvName ?? null, rows: releaseRows });
+  }
+
+  const orphanNames = [...new Set(rows.map((r) => r.client))]
+    .filter((c) => !mappedNames.has(c))
+    .sort((a, b) => a.localeCompare(b, "en"));
+
+  for (const name of orphanNames) {
+    sections.push({
+      kind: "orphan",
+      slug: null,
+      tsvName: name,
+      rows: byClient.get(name) ?? [],
+    });
+  }
+
+  return sections;
 }
 
 function compareIsoDateDesc(a, b) {

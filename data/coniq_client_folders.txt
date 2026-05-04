@@ -1,0 +1,16 @@
+# Synced from /Users/dayerdl/coniq_csa/clients (exclude default)
+balharbour
+batavia
+bergen
+helsinki
+ldo
+marques
+moa
+nwe
+sandboxsprings
+turawa
+villagemarket
+villagemarketconiq
+villaggio
+wafi
+wolfsburg

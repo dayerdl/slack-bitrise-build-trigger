@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  buildConiqCatalogSections,
   filterRowsByClientQuery,
   groupReleasesByClient,
   parseClientReleasesTsv,
@@ -40,4 +41,30 @@ Foo Baz	2.0.0	2025-02-01	prod	r	`);
 
   const partial = filterRowsByClientQuery(rows, "Foo");
   assert.equal(partial.length, 2);
+});
+
+test("filterRowsByClientQuery resolves Coniq slug via catalog", () => {
+  const rows = [
+    { client: "Mall of America", version: "1", date: "", env: "", status: "", notes: "" },
+    { client: "Other", version: "2", date: "", env: "", status: "", notes: "" },
+  ];
+  const catalog = {
+    slugs: ["moa", "other"],
+    slugToTsv: { moa: "Mall of America", other: null },
+  };
+  const out = filterRowsByClientQuery(rows, "moa", catalog);
+  assert.equal(out.length, 1);
+  assert.equal(out[0].client, "Mall of America");
+});
+
+test("buildConiqCatalogSections includes orphan TSV clients", () => {
+  const rows = parseClientReleasesTsv(`client	version	date	env	status	notes
+Mall of America	1	2025-01-01	prod	r	
+OWA	2	2025-01-02	prod	r	`);
+  const slugToTsv = { moa: "Mall of America" };
+  const sec = buildConiqCatalogSections(rows, ["moa"], slugToTsv);
+  assert.equal(sec.length, 2);
+  assert.equal(sec[0].kind, "coniq");
+  assert.equal(sec[1].kind, "orphan");
+  assert.equal(sec[1].tsvName, "OWA");
 });

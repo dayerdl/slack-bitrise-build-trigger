@@ -9,7 +9,8 @@
   },
   "scripts": {
     "dev": "npx vercel dev",
-    "test": "node --test"
+    "test": "node --test",
+    "sync-coniq-clients": "node scripts/sync-coniq-client-folders.mjs"
   },
   "dependencies": {
     "@vercel/functions": "latest"
