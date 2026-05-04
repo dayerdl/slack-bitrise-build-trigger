@@ -155,6 +155,26 @@ export function buildConiqCatalogSections(rows, slugs, slugToTsv) {
   return sections;
 }
 
+/**
+ * Sort rows for `client-releases.tsv`: client name (A–Z), then date (newest first),
+ * then version (descending, numeric-aware when possible).
+ */
+export function sortTsvReleaseRows(rows) {
+  return [...rows].sort((a, b) => {
+    const byClient = a.client.localeCompare(b.client, "en", { sensitivity: "base" });
+    if (byClient !== 0) {
+      return byClient;
+    }
+
+    const byDate = compareIsoDateDesc(a.date, b.date);
+    if (byDate !== 0) {
+      return byDate;
+    }
+
+    return String(b.version).localeCompare(String(a.version), "en", { numeric: true, sensitivity: "base" });
+  });
+}
+
 function compareIsoDateDesc(a, b) {
   if (!a && !b) {
     return 0;

@@ -1,4 +1,4 @@
-import { parseClientReleasesTsv } from "./clientReleases.js";
+import { parseClientReleasesTsv, sortTsvReleaseRows } from "./clientReleases.js";
 
 export class ReleaseMutationError extends Error {
   constructor(message) {
@@ -108,9 +108,10 @@ export function deleteReleaseFromTsvContent(tsvContent, clientDisplay, version) 
 }
 
 export function serializeClientReleasesTsv(rows) {
+  const sorted = sortTsvReleaseRows(rows);
   const lines = ["client\tversion\tdate\tenv\tstatus\tnotes"];
 
-  for (const r of rows) {
+  for (const r of sorted) {
     lines.push(
       [
         sanitizeField(r.client),

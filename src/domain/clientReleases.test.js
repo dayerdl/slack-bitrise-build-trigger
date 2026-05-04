@@ -6,6 +6,7 @@ import {
   filterRowsByClientQuery,
   groupReleasesByClient,
   parseClientReleasesTsv,
+  sortTsvReleaseRows,
 } from "./clientReleases.js";
 
 test("parses TSV rows", () => {
@@ -55,6 +56,19 @@ test("filterRowsByClientQuery resolves Coniq slug via catalog", () => {
   const out = filterRowsByClientQuery(rows, "moa", catalog);
   assert.equal(out.length, 1);
   assert.equal(out[0].client, "Mall of America");
+});
+
+test("sortTsvReleaseRows sorts by client then date desc", () => {
+  const rows = [
+    { client: "Z", version: "1", date: "2025-01-01", env: "p", status: "", notes: "" },
+    { client: "A", version: "2", date: "2025-06-01", env: "p", status: "", notes: "" },
+    { client: "A", version: "1", date: "2025-03-01", env: "p", status: "", notes: "" },
+  ];
+  const sorted = sortTsvReleaseRows(rows);
+  assert.equal(sorted[0].client, "A");
+  assert.equal(sorted[0].date, "2025-06-01");
+  assert.equal(sorted[1].date, "2025-03-01");
+  assert.equal(sorted[2].client, "Z");
 });
 
 test("buildConiqCatalogSections includes orphan TSV clients", () => {
