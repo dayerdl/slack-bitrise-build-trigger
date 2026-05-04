@@ -44,7 +44,61 @@ export async function triggerBitriseBuild({ appSlug, apiToken, command, abortSig
   };
 }
 
+export function buildBitriseEnvironmentsForApi(command) {
+  const env = { ...command.env };
+  const account = firstNonEmpty(env.platform_account, env.build_customer);
+  if (account) {
+    env.platform_account = account;
+    env.build_customer = account;
+  }
+
+  const buildIos = firstNonEmpty(env.BUILD_IOS, env.build_ios);
+  if (buildIos) {
+    env.BUILD_IOS = buildIos;
+  }
+
+  const buildAndroid = firstNonEmpty(env.BUILD_ANDROID, env.build_android);
+  if (buildAndroid) {
+    env.BUILD_ANDROID = buildAndroid;
+  }
+
+  const versionParts = splitBuildVersion(env.build_version);
+  if (versionParts) {
+    env.app_version_major ||= versionParts.major;
+    env.app_version_minor ||= versionParts.minor;
+    env.app_version_patch ||= versionParts.patch;
+  }
+
+  return env;
+}
+
+function firstNonEmpty(...values) {
+  for (const value of values) {
+    const normalized = String(value ?? "").trim();
+    if (normalized) {
+      return normalized;
+    }
+  }
+  return "";
+}
+
+function splitBuildVersion(value) {
+  const version = String(value ?? "").trim();
+  if (!version) {
+    return null;
+  }
+
+  const [major, minor, ...patchParts] = version.split(".");
+  const patch = patchParts.join(".");
+  if (!major || !minor || !patch) {
+    return null;
+  }
+
+  return { major, minor, patch };
+}
+
 function toBitrisePayload(command) {
+  const env = buildBitriseEnvironmentsForApi(command);
   return {
     hook_info: {
       type: "bitrise",
@@ -52,7 +106,7 @@ function toBitrisePayload(command) {
     build_params: {
       branch: command.branch,
       workflow_id: command.workflow,
-      environments: Object.entries(command.env).map(([key, value]) => ({
+      environments: Object.entries(env).map(([key, value]) => ({
         mapped_to: key,
         value,
         is_expand: false,

@@ -6,8 +6,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_LOCAL_TSV = join(__dirname, "../../data/client-releases.tsv");
 
 /**
- * Load / save `client-releases.tsv` — GitHub API when `GITHUB_TOKEN` + `GITHUB_REPOSITORY` are set,
- * otherwise local file (for `vercel dev` / tests).
+ * Load / save `client-releases.tsv` — remote content API when `GITHUB_TOKEN` + `GITHUB_REPOSITORY` are set,
+ * otherwise local file (for local dev / tests).
  */
 export function createReleaseDataStore() {
   const token = String(process.env.GITHUB_TOKEN ?? "").trim();
@@ -17,7 +17,7 @@ export function createReleaseDataStore() {
 
   if (process.env.VERCEL === "1" && (!token || !repoFull)) {
     throw new Error(
-      "Vercel filesystem is read-only. Set `GITHUB_TOKEN` and `GITHUB_REPOSITORY` so releases are saved via the GitHub API."
+      "The deployment filesystem is read-only. Set `GITHUB_TOKEN` and `GITHUB_REPOSITORY` so releases are saved through the content API."
     );
   }
 
@@ -73,17 +73,17 @@ async function githubGetFileMeta({ token, owner, repo, branch, path }) {
   });
 
   if (res.status === 404) {
-    throw new Error(`GitHub: file not found (${path} on ${branch}).`);
+    throw new Error(`Repository file not found (${path} on ${branch}).`);
   }
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`GitHub GET failed (${res.status}): ${body}`);
+    throw new Error(`Repository read failed (${res.status}): ${body}`);
   }
 
   const data = await res.json();
   if (!data.sha) {
-    throw new Error("GitHub response missing sha.");
+    throw new Error("Repository response missing file version (sha).");
   }
 
   return { sha: data.sha };
@@ -96,17 +96,17 @@ async function githubGetFileContent({ token, owner, repo, branch, path }) {
   });
 
   if (res.status === 404) {
-    throw new Error(`GitHub: file not found (${path} on ${branch}).`);
+    throw new Error(`Repository file not found (${path} on ${branch}).`);
   }
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`GitHub GET failed (${res.status}): ${body}`);
+    throw new Error(`Repository read failed (${res.status}): ${body}`);
   }
 
   const data = await res.json();
   if (typeof data.content !== "string" || data.encoding !== "base64") {
-    throw new Error("GitHub file response was not base64 text.");
+    throw new Error("File response was not base64 text.");
   }
 
   return Buffer.from(data.content.replace(/\n/g, ""), "base64").toString("utf8");
@@ -132,7 +132,7 @@ async function githubPutFileContent({ token, owner, repo, branch, path, content,
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`GitHub PUT failed (${res.status}): ${text}`);
+    throw new Error(`Repository update failed (${res.status}): ${text}`);
   }
 }
 

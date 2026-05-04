@@ -25,7 +25,7 @@ export function loadSlugToTsvMap(path = DEFAULT_SLUG_TO_TSV_PATH) {
   return JSON.parse(raw);
 }
 
-/** Maps `ENV[build_customer]` → `client-releases.tsv` client column (Bitrise → release table). */
+/** Maps `ENV[platform_account]` (account slug) → `client-releases.tsv` client column. */
 export function loadBuildCustomerToTsvMap(path = DEFAULT_BUILD_CUSTOMER_TO_TSV_PATH) {
   try {
     const raw = readFileSync(path, "utf8");

@@ -1,0 +1,33 @@
+# Helsinki — Flutter build history
+
+client: Helsinki
+slug: helsinki
+
+releases:
+  - build: "2.9.804"
+    build_date: "2025-11-27"
+    environment: Production
+    status: RELEASED
+    apk_link: null
+    notes: null
+
+  - build: "2.9.803"
+    build_date: "2025-11-13"
+    environment: Stage
+    status: null
+    apk_link: null
+    notes: "APP-3165: Helsinki: New Stage build for final client approval — Resolved"
+
+  - build: "2.9.802"
+    build_date: "2025-11-12"
+    environment: Stage
+    status: Internal Review
+    apk_link: null
+    notes: "Final pre-launch build"
+
+  - build: "2.9.801"
+    build_date: "2025-10-24"
+    environment: Production
+    status: Pre-launch
+    apk_link: "APK Link"
+    notes: "APP-3165: Helsinki: New Stage build for final client approval — Resolved; Core build with client branding"

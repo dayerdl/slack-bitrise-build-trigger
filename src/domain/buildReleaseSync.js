@@ -1,5 +1,5 @@
 /**
- * Map Bitrise `ENV[build_customer]` to the `client` column in `client-releases.tsv`.
+ * Map Bitrise `ENV[platform_account]` to the `client` column in `client-releases.tsv`.
  * `build_customer_to_tsv_client.json` is the source of truth; then fall back to Coniq folder slugs in `client_slug_to_tsv.json`.
  *
  * @param {string} buildCustomer

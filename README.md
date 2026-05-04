@@ -5,22 +5,21 @@ Vercel Node.js API endpoint for the `/flutter-build` Slack slash command. It val
 ## Command Format
 
 ```text
-/flutter-build workflow:deploy | branch:master | ENV[build_env]:prod | ENV[build_customer]:tanger | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:8.0.18
+/flutter-build workflow:deploy | branch:development | ENV[build_env]:stage | ENV[platform_account]:liwa | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:0.0.12
 ```
 
 Required parameters:
 
 - `workflow`: Bitrise workflow to execute, for example `deploy`.
-- `branch`: Git branch to build, for example `master`.
+- `branch`: Git branch to build.
 - `ENV[build_env]`: Must be `qa`, `pre`, `stage`, or `prod`.
-- `ENV[build_customer]`: Must exist in `ALLOWED_CUSTOMERS`.
+- `ENV[platform_account]` (or `ENV[build_customer]` as an alias): Must exist in `ALLOWED_CUSTOMERS`. Sent to Bitrise as `platform_account` and `build_customer`.
 
 Optional parameters:
 
-- `ENV[build_ios]`: `true` or `false`. Defaults to `true` when omitted.
-- `ENV[build_android]`: `true` or `false`.
-- `ENV[build_version]`: Build version. If omitted, Bitrise can keep using its workflow default, for example `2.9.$BITRISE_BUILD_NUMBER`.
-- Any other `ENV[...]` parameter is forwarded to Bitrise as an environment variable.
+- `ENV[build_ios]` / `ENV[build_android]`: `true` or `false`. Defaults: iOS `true`, Android `false`. Mapped to Bitrise `BUILD_IOS` and `BUILD_ANDROID`.
+- `ENV[build_version]`: Semantic version `major.minor.patch` (for example `0.0.12` or `8.0.18`). The trigger adds `app_version_major`, `app_version_minor`, and `app_version_patch` for the workflow unless you set those `ENV[...]` keys yourself.
+- `ENV[app_version_major]`, `ENV[app_version_minor]`, `ENV[app_version_patch]`: optional overrides; any other `ENV[...]` is also forwarded to Bitrise.
 
 ## Project Structure
 
@@ -41,7 +40,7 @@ Copy `.env.example` to `.env` for local development, and add the same values in 
 SLACK_SIGNING_SECRET=...
 BITRISE_API_TOKEN=...
 BITRISE_APP_SLUG=...
-ALLOWED_CUSTOMERS=whitelabel,tanger,moa,wolfsburg,village
+ALLOWED_CUSTOMERS=whitelabel,tanger,moa,wolfsburg,village,liwa
 ```
 
 `BITRISE_API_TOKEN` must be a Bitrise personal access token that can trigger builds for `BITRISE_APP_SLUG`.

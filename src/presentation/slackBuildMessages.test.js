@@ -13,7 +13,7 @@ test("ack payload includes in_channel and blocks", () => {
       branch: "main",
       env: {
         build_env: "prod",
-        build_customer: "tanger",
+        platform_account: "tanger",
         build_ios: "true",
         build_android: "false",
       },
@@ -32,7 +32,7 @@ test("Bitrise success payload mentions TSV when releaseTsvResult ok", () => {
   const command = {
     workflow: "deploy",
     branch: "master",
-    env: { build_version: "8.0.18", build_customer: "tanger", build_env: "prod" },
+    env: { build_version: "8.0.18", platform_account: "tanger", build_env: "prod" },
   };
   const payload = buildBitriseSuccessPayload({
     command,

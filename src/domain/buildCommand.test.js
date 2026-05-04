@@ -15,6 +15,7 @@ test("parses a full Slack build command", () => {
     env: {
       build_env: "prod",
       build_customer: "tanger",
+      platform_account: "tanger",
       build_ios: "true",
       build_android: "false",
       build_version: "8.0.18",
@@ -22,15 +23,41 @@ test("parses a full Slack build command", () => {
   });
 });
 
+test("accepts platform_account directly", () => {
+  const command = parseBuildCommand(
+    "workflow:deploy | branch:master | ENV[build_env]:prod | ENV[platform_account]:tanger",
+    { allowedCustomers: ["tanger"] }
+  );
+
+  assert.equal(command.env.platform_account, "tanger");
+  assert.equal(command.env.build_customer, "tanger");
+});
+
 test("defaults build_ios to true when omitted", () => {
-  const command = parseBuildCommand("workflow:deploy | branch:master | ENV[build_env]:qa | ENV[build_customer]:moa");
+  const command = parseBuildCommand("workflow:deploy | branch:master | ENV[build_env]:qa | ENV[platform_account]:moa");
 
   assert.equal(command.env.build_ios, "true");
 });
 
+test("defaults build_android to false when omitted", () => {
+  const command = parseBuildCommand("workflow:deploy | branch:master | ENV[build_env]:qa | ENV[platform_account]:moa");
+
+  assert.equal(command.env.build_android, "false");
+});
+
 test("rejects invalid build environments", () => {
   assert.throws(
-    () => parseBuildCommand("workflow:deploy | branch:master | ENV[build_env]:dev | ENV[build_customer]:moa"),
+    () => parseBuildCommand("workflow:deploy | branch:master | ENV[build_env]:dev | ENV[platform_account]:moa"),
+    BuildCommandValidationError
+  );
+});
+
+test("rejects invalid build versions", () => {
+  assert.throws(
+    () =>
+      parseBuildCommand(
+        "workflow:deploy | branch:master | ENV[build_env]:stage | ENV[build_customer]:moa | ENV[build_version]:8.0"
+      ),
     BuildCommandValidationError
   );
 });
@@ -38,7 +65,7 @@ test("rejects invalid build environments", () => {
 test("rejects customers outside the configured allow list", () => {
   assert.throws(
     () =>
-      parseBuildCommand("workflow:deploy | branch:master | ENV[build_env]:qa | ENV[build_customer]:unknown", {
+      parseBuildCommand("workflow:deploy | branch:master | ENV[build_env]:qa | ENV[platform_account]:unknown", {
         allowedCustomers: ["moa"],
       }),
     BuildCommandValidationError

@@ -8,7 +8,7 @@ import { createReleaseDataStore } from "../infrastructure/releaseDataStore.js";
 
 /**
  * After a successful Bitrise trigger, append a row to `client-releases.tsv` when
- * `ENV[build_version]` is set and `ENV[build_customer]` maps to a TSV client.
+ * `ENV[build_version]` is set and `ENV[platform_account]` maps to a TSV client.
  *
  * @returns {Promise<{ ok: true } | { ok: false; reason: string }>}
  */
@@ -33,7 +33,7 @@ export async function persistReleaseRowAfterBitriseTrigger(command) {
   const buildCustomerMap = loadBuildCustomerToTsvMap();
   const slugToTsv = loadSlugToTsvMap();
   const client = resolveTsvClientForBuildCustomer(
-    command.env?.build_customer,
+    command.env?.platform_account,
     buildCustomerMap,
     slugToTsv
   );

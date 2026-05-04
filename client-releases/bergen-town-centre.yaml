@@ -1,0 +1,48 @@
+# Bergen Town Centre — Flutter build history (from client overview)
+# Fields: build_version, build_date, environment, status, apk_link, notes
+
+client: Bergen Town Centre
+slug: bergen-town-centre
+
+releases:
+  - build: "3.0.16"
+    build_date: "2025-11-21"
+    environment: Production
+    status: RELEASED
+    apk_link: null
+    notes: null
+
+  - build: "3.0.15"
+    build_date: "2025-11-20"
+    environment: Stage
+    status: null
+    apk_link: null
+    notes: "APP-3172: BTC: Address issues arising from client UAT — Done"
+
+  - build: "3.0.14"
+    build_date: "2025-11-19"
+    environment: Stage
+    status: null
+    apk_link: null
+    notes: null
+
+  - build: "3.0.13"
+    build_date: "2025-11-18"
+    environment: Stage
+    status: null
+    apk_link: null
+    notes: null
+
+  - build: "3.0.12"
+    build_date: "2025-11-06"
+    environment: Stage
+    status: Internal Review
+    apk_link: null
+    notes: "Support for single-tier TRP (APP-3146)"
+
+  - build: "3.0.10"
+    build_date: "2025-10-16"
+    environment: Stage
+    status: (Feedback)
+    apk_link: null
+    notes: "APP-2841: Regression test Bergen Town Centre stage 3.0.9 — Resolved"

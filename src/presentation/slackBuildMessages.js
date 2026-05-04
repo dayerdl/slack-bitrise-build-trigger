@@ -13,7 +13,7 @@ export function buildAcknowledgementPayload({ command, userId, userName }) {
     { type: "mrkdwn", text: `*Workflow*\n${command.workflow}` },
     { type: "mrkdwn", text: `*Branch*\n${command.branch}` },
     { type: "mrkdwn", text: `*Env*\n${env.build_env ?? "—"}` },
-    { type: "mrkdwn", text: `*Customer*\n${env.build_customer ?? "—"}` },
+    { type: "mrkdwn", text: `*Platform account*\n${env.platform_account ?? "—"}` },
   ];
 
   if (env.build_version) {
@@ -69,12 +69,12 @@ export function buildBitriseSuccessPayload({ command, buildUrl, buildNumber, rel
   if (releaseTsvResult?.ok) {
     contextElements.push({
       type: "mrkdwn",
-      text: "_`data/client-releases.tsv` updated on GitHub._",
+      text: "_`data/client-releases.tsv` updated in the repository._",
     });
   } else if (releaseTsvResult?.reason === "no_mapping") {
     contextElements.push({
       type: "mrkdwn",
-      text: "_Release list not updated: add a mapping in `data/build_customer_to_tsv_client.json` for this `ENV[build_customer]`._",
+      text: "_Release list not updated: add a mapping in `data/build_customer_to_tsv_client.json` for this `ENV[platform_account]`._",
     });
   } else if (releaseTsvResult?.reason === "no_version") {
     contextElements.push({

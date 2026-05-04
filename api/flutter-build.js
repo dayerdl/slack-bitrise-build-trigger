@@ -36,8 +36,8 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    // Vercel's Node `req` helpers parse the body; Slack needs the exact raw
-    // string for signature verification. The Web Request API gives it intact.
+    // The host must pass the raw body; Slack needs the exact string for
+    // signature verification. The Web Request API provides it intact.
     const rawBody = await request.text();
 
     const isVerified = verifySlackSignature({
@@ -50,7 +50,7 @@ export async function POST(request) {
     if (!isVerified) {
       if (!String(process.env.SLACK_SIGNING_SECRET ?? "").trim()) {
         console.warn(
-          "slack-bitrise: SLACK_SIGNING_SECRET is missing. Add it under Vercel → Production env and redeploy."
+          "slack-bitrise: SLACK_SIGNING_SECRET is missing. Add it to the production environment and redeploy."
         );
       } else {
         console.warn(

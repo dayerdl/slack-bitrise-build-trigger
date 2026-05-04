@@ -40,7 +40,7 @@ test("empty when no text", () => {
 test("build intent for workflow line", () => {
   assert.equal(
     parseFlutterBuildIntent(
-      "workflow:deploy | branch:master | ENV[build_env]:prod | ENV[build_customer]:moa"
+      "workflow:deploy | branch:master | ENV[build_env]:prod | ENV[platform_account]:moa"
     ).type,
     "build"
   );

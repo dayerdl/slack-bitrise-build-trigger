@@ -18,7 +18,7 @@ function ensureCanPersistReleases() {
   const repo = String(process.env.GITHUB_REPOSITORY ?? "").trim();
   if (!token || !repo) {
     throw new ReleaseMutationError(
-      "On Vercel the filesystem is read-only. Set both `GITHUB_TOKEN` (contents:write on the repo) and `GITHUB_REPOSITORY` (e.g. `dayerdl/slack-bitrise-build-trigger`), then redeploy. See `.env.example`."
+      "The deployment environment has a read-only filesystem. Set both `GITHUB_TOKEN` and `GITHUB_REPOSITORY` (e.g. `dayerdl/slack-bitrise-build-trigger`), then redeploy. See `.env.example`."
     );
   }
 }
