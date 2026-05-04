@@ -5,12 +5,12 @@ Vercel Node.js API endpoint for the `/flutter-build` Slack slash command. It val
 ## Command Format
 
 ```text
-/flutter-build workflow:deploy | branch:development | ENV[build_env]:stage | ENV[platform_account]:liwa | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:0.0.12
+/flutter-build workflow:deployFromSlack | branch:development | ENV[build_env]:stage | ENV[platform_account]:liwa | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:0.0.12
 ```
 
 Required parameters:
 
-- `workflow`: Bitrise workflow to execute, for example `deploy`.
+- `workflow`: Bitrise workflow id, for example `deployFromSlack`. The shorthand `deploy` is sent as `deployFromSlack`.
 - `branch`: Git branch to build.
 - `ENV[build_env]`: Must be `qa`, `pre`, `stage`, or `prod`.
 - `ENV[platform_account]` (or `ENV[build_customer]` as an alias): Must exist in `ALLOWED_CUSTOMERS`. Sent to Bitrise as `platform_account` and `build_customer`.
@@ -20,6 +20,7 @@ Optional parameters:
 - `ENV[build_ios]` / `ENV[build_android]`: `true` or `false`. Defaults: iOS `true`, Android `false`. Mapped to Bitrise `BUILD_IOS` and `BUILD_ANDROID`.
 - `ENV[build_version]`: Semantic version `major.minor.patch` (for example `0.0.12` or `8.0.18`). The trigger adds `app_version_major`, `app_version_minor`, and `app_version_patch` for the workflow unless you set those `ENV[...]` keys yourself.
 - `ENV[app_version_major]`, `ENV[app_version_minor]`, `ENV[app_version_patch]`: optional overrides; any other `ENV[...]` is also forwarded to Bitrise.
+- `ENV[build_message]`: optional text shown on the Bitrise build details (API `commit_message`). If omitted, a short summary of the slash command is used instead. This value is not injected as a Bitrise environment variable.
 
 ## Project Structure
 

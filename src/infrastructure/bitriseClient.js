@@ -1,3 +1,5 @@
+import { formatBitriseTriggerMessage } from "../domain/buildCommand.js";
+
 const BITRISE_API_BASE_URL = "https://api.bitrise.io/v0.1";
 
 export class BitriseClientError extends Error {
@@ -24,7 +26,7 @@ export async function triggerBitriseBuild({ appSlug, apiToken, command, abortSig
       Authorization: apiToken,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(toBitrisePayload(command)),
+    body: JSON.stringify(buildBitriseRequestBody(command)),
   });
 
   const responseBody = await readJsonSafely(response);
@@ -46,6 +48,8 @@ export async function triggerBitriseBuild({ appSlug, apiToken, command, abortSig
 
 export function buildBitriseEnvironmentsForApi(command) {
   const env = { ...command.env };
+  delete env.build_message;
+
   const account = firstNonEmpty(env.platform_account, env.build_customer);
   if (account) {
     env.platform_account = account;
@@ -97,7 +101,13 @@ function splitBuildVersion(value) {
   return { major, minor, patch };
 }
 
-function toBitrisePayload(command) {
+/** Bitrise workflow id; `deploy` is an alias for the Slack-specific workflow. */
+export function resolveBitriseWorkflowId(workflow) {
+  const w = String(workflow ?? "").trim();
+  return w === "deploy" ? "deployFromSlack" : w;
+}
+
+export function buildBitriseRequestBody(command) {
   const env = buildBitriseEnvironmentsForApi(command);
   return {
     hook_info: {
@@ -105,7 +115,8 @@ function toBitrisePayload(command) {
     },
     build_params: {
       branch: command.branch,
-      workflow_id: command.workflow,
+      workflow_id: resolveBitriseWorkflowId(command.workflow),
+      commit_message: formatBitriseTriggerMessage(command),
       environments: Object.entries(env).map(([key, value]) => ({
         mapped_to: key,
         value,

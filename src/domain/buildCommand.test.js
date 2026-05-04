@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { BuildCommandValidationError, parseBuildCommand } from "./buildCommand.js";
+import {
+  BuildCommandValidationError,
+  formatBitriseTriggerMessage,
+  parseBuildCommand,
+} from "./buildCommand.js";
 
 test("parses a full Slack build command", () => {
   const command = parseBuildCommand(
@@ -60,6 +64,32 @@ test("rejects invalid build versions", () => {
       ),
     BuildCommandValidationError
   );
+});
+
+test("formatBitriseTriggerMessage uses ENV build_message when set", () => {
+  const command = {
+    workflow: "deployFromSlack",
+    branch: "development",
+    env: {
+      build_env: "stage",
+      platform_account: "liwa",
+      build_version: "0.0.12",
+      build_message: "Custom title only",
+    },
+  };
+  assert.equal(formatBitriseTriggerMessage(command), "Custom title only");
+});
+
+test("formatBitriseTriggerMessage omits build_message from default summary", () => {
+  const command = {
+    workflow: "deployFromSlack",
+    branch: "main",
+    env: { build_env: "prod", platform_account: "moa", build_version: "1.0.0" },
+  };
+  const msg = formatBitriseTriggerMessage(command);
+  assert.ok(msg.startsWith("Slack /flutter-build —"));
+  assert.ok(msg.includes("platform_account=moa"));
+  assert.ok(!msg.includes("build_message"));
 });
 
 test("rejects customers outside the configured allow list", () => {

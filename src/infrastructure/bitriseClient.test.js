@@ -1,7 +1,42 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildBitriseEnvironmentsForApi } from "./bitriseClient.js";
+import {
+  buildBitriseEnvironmentsForApi,
+  buildBitriseRequestBody,
+  resolveBitriseWorkflowId,
+} from "./bitriseClient.js";
+
+test("buildBitriseRequestBody sets commit_message and omits build_message from environments", () => {
+  const body = buildBitriseRequestBody({
+    workflow: "deployFromSlack",
+    branch: "development",
+    env: {
+      build_env: "stage",
+      platform_account: "liwa",
+      build_version: "0.0.12",
+      build_message: "RC for Liwa smoke test",
+    },
+  });
+  assert.equal(body.build_params.commit_message, "RC for Liwa smoke test");
+  const keys = body.build_params.environments.map((e) => e.mapped_to);
+  assert.ok(!keys.includes("build_message"));
+});
+
+test("buildBitriseRequestBody commit_message defaults when build_message unset", () => {
+  const body = buildBitriseRequestBody({
+    workflow: "deployFromSlack",
+    branch: "main",
+    env: { build_env: "prod", platform_account: "moa", build_version: "1.0.0" },
+  });
+  assert.ok(body.build_params.commit_message.includes("Slack /flutter-build"));
+});
+
+test("resolveBitriseWorkflowId maps deploy to deployFromSlack", () => {
+  assert.equal(resolveBitriseWorkflowId("deploy"), "deployFromSlack");
+  assert.equal(resolveBitriseWorkflowId("deployFromSlack"), "deployFromSlack");
+  assert.equal(resolveBitriseWorkflowId("other"), "other");
+});
 
 test("buildBitriseEnvironmentsForApi mirrors platform_account to build_customer", () => {
   const env = buildBitriseEnvironmentsForApi({

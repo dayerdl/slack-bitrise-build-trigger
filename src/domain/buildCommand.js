@@ -61,9 +61,10 @@ export function buildSlackUsage() {
       "• `/flutter-build list bergen` — one client (slug or TSV name).",
       "• `/flutter-build release add | client:moa | version:4.2.400 | date:2026-05-04 | env:prod | status:released | notes:APP-999` — append a row; set `GITHUB_TOKEN` + `GITHUB_REPOSITORY` when the app cannot write `data/client-releases.tsv` locally.",
       "• `/flutter-build release delete | client:moa | version:4.2.400` — remove a row; same as add.",
-      "• `/flutter-build workflow:deploy | branch:development | ENV[build_env]:stage | ENV[platform_account]:liwa | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:0.0.12` — trigger Bitrise (matches typical `deploy` workflow envs).",
+      "• `/flutter-build workflow:deployFromSlack | branch:development | ENV[build_env]:stage | ENV[platform_account]:liwa | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:0.0.12` — trigger Bitrise (`workflow:deploy` is an alias for `deployFromSlack`).",
+      "Optional: `ENV[build_message]:…` — custom text on the Bitrise build; otherwise a short summary is sent.",
       "",
-      "Release table: https://github.com/dayerdl/slack-bitrise-build-trigger/blob/main/data/client-releases.tsv",    
+      "Release table: https://github.com/dayerdl/slack-bitrise-build-trigger/blob/main/data/client-releases.tsv",
     ].join("\n") + formatClientHelpAppendix()
   );
 }
@@ -74,6 +75,32 @@ export function formatCommandSummary(command) {
     .join(", ");
 
   return `workflow=${command.workflow}, branch=${command.branch}, ${envSummary}`;
+}
+
+const BITRISE_COMMIT_MESSAGE_MAX = 500;
+
+/**
+ * Shown on the Bitrise build (API `build_params.commit_message`).
+ * Optional `ENV[build_message]` overrides; it is not forwarded as a build env var.
+ */
+export function formatBitriseTriggerMessage(command) {
+  const custom = String(command.env?.build_message ?? "").trim();
+  if (custom) {
+    return truncateUtf16ByLength(custom, BITRISE_COMMIT_MESSAGE_MAX);
+  }
+
+  const { build_message: _drop, ...restEnv } = command.env;
+  return truncateUtf16ByLength(
+    `Slack /flutter-build — ${formatCommandSummary({ ...command, env: restEnv })}`,
+    BITRISE_COMMIT_MESSAGE_MAX
+  );
+}
+
+function truncateUtf16ByLength(text, maxChars) {
+  if (text.length <= maxChars) {
+    return text;
+  }
+  return `${text.slice(0, Math.max(0, maxChars - 3))}...`;
 }
 
 function tokenizeCommand(input) {
