@@ -53,7 +53,7 @@ export function buildAcknowledgementPayload({ command, userId, userName }) {
   };
 }
 
-export function buildBitriseSuccessPayload({ command, buildUrl, buildNumber }) {
+export function buildBitriseSuccessPayload({ command, buildUrl, buildNumber, releaseTsvResult }) {
   const summaryLine = formatCommandSummary(command);
   const linkText = buildUrl
     ? `<${buildUrl}|Open build in Bitrise>`
@@ -63,6 +63,30 @@ export function buildBitriseSuccessPayload({ command, buildUrl, buildNumber }) {
     buildNumber !== undefined && buildNumber !== null
       ? `Build running (#${buildNumber})`
       : "Build running on Bitrise";
+
+  const contextElements = [{ type: "mrkdwn", text: summaryLine }];
+
+  if (releaseTsvResult?.ok) {
+    contextElements.push({
+      type: "mrkdwn",
+      text: "_`data/client-releases.tsv` updated on GitHub._",
+    });
+  } else if (releaseTsvResult?.reason === "no_mapping") {
+    contextElements.push({
+      type: "mrkdwn",
+      text: "_Release list not updated: add a mapping in `data/build_customer_to_tsv_client.json` for this `ENV[build_customer]`._",
+    });
+  } else if (releaseTsvResult?.reason === "no_version") {
+    contextElements.push({
+      type: "mrkdwn",
+      text: "_Release list not updated: set `ENV[build_version]` to record a version row._",
+    });
+  } else if (releaseTsvResult?.reason === "duplicate") {
+    contextElements.push({
+      type: "mrkdwn",
+      text: "_Release list: a row for this client and version already exists (unchanged)._",
+    });
+  }
 
   return {
     response_type: "in_channel",
@@ -85,7 +109,7 @@ export function buildBitriseSuccessPayload({ command, buildUrl, buildNumber }) {
       },
       {
         type: "context",
-        elements: [{ type: "mrkdwn", text: summaryLine }],
+        elements: contextElements,
       },
     ],
   };

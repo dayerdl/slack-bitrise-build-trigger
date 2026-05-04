@@ -16,6 +16,7 @@ import { parseFlutterBuildIntent } from "../src/domain/flutterBuildIntent.js";
 import { triggerBitriseBuild } from "../src/infrastructure/bitriseClient.js";
 import { verifySlackSignature } from "../src/infrastructure/slackSignature.js";
 import { buildClientListPayload } from "../src/presentation/slackClientList.js";
+import { persistReleaseRowAfterBitriseTrigger } from "../src/application/persistReleaseAfterBuild.js";
 import {
   buildAcknowledgementPayload,
   buildBitriseErrorPayload,
@@ -167,12 +168,21 @@ async function triggerBuildAndNotifySlack({ command, slackPayload }) {
       command,
     });
 
+    let releaseTsvResult;
+    try {
+      releaseTsvResult = await persistReleaseRowAfterBitriseTrigger(command);
+    } catch (syncError) {
+      console.error("Release TSV sync after Bitrise failed", syncError);
+      releaseTsvResult = { ok: false, reason: "error", message: syncError.message };
+    }
+
     await postSlackResponse(
       slackPayload.response_url,
       buildBitriseSuccessPayload({
         command,
         buildUrl: build.buildUrl,
         buildNumber: build.buildNumber,
+        releaseTsvResult,
       })
     );
   } catch (error) {

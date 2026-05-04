@@ -6,6 +6,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const DEFAULT_CONIQ_SLUGS_PATH = join(__dirname, "../../data/coniq_client_folders.txt");
 export const DEFAULT_SLUG_TO_TSV_PATH = join(__dirname, "../../data/client_slug_to_tsv.json");
+export const DEFAULT_BUILD_CUSTOMER_TO_TSV_PATH = join(
+  __dirname,
+  "../../data/build_customer_to_tsv_client.json"
+);
 
 export function loadConiqClientSlugs(path = DEFAULT_CONIQ_SLUGS_PATH) {
   const content = readFileSync(path, "utf8");
@@ -19,6 +23,16 @@ export function loadConiqClientSlugs(path = DEFAULT_CONIQ_SLUGS_PATH) {
 export function loadSlugToTsvMap(path = DEFAULT_SLUG_TO_TSV_PATH) {
   const raw = readFileSync(path, "utf8");
   return JSON.parse(raw);
+}
+
+/** Maps `ENV[build_customer]` → `client-releases.tsv` client column (Bitrise → release table). */
+export function loadBuildCustomerToTsvMap(path = DEFAULT_BUILD_CUSTOMER_TO_TSV_PATH) {
+  try {
+    const raw = readFileSync(path, "utf8");
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
 }
 
 export function buildCatalogContext() {
