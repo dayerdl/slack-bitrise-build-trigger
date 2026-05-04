@@ -9,52 +9,66 @@ import {
 import { triggerBitriseBuild } from "../src/infrastructure/bitriseClient.js";
 import { verifySlackSignature } from "../src/infrastructure/slackSignature.js";
 
-export default async function handler(request, response) {
-  if (request.method !== "POST") {
-    return sendJson(response, 405, {
-      response_type: "ephemeral",
-      text: "Use POST for the /flutter-build Slack command.",
-    });
-  }
+function jsonResponse(statusCode, payload) {
+  return Response.json(payload, { status: statusCode });
+}
 
-  const rawBody = await readRawBody(request);
-  const isVerified = verifySlackSignature({
-    rawBody,
-    timestamp: request.headers["x-slack-request-timestamp"],
-    signature: request.headers["x-slack-signature"],
-    signingSecret: process.env.SLACK_SIGNING_SECRET,
+export async function GET() {
+  return jsonResponse(405, {
+    response_type: "ephemeral",
+    text: "Use POST for the /flutter-build Slack command.",
   });
+}
 
-  if (!isVerified) {
-    return sendJson(response, 401, {
-      response_type: "ephemeral",
-      text: "Slack signature verification failed.",
-    });
-  }
-
-  const slackPayload = Object.fromEntries(new URLSearchParams(rawBody));
-  const allowedCustomers = parseAllowedCustomers(process.env.ALLOWED_CUSTOMERS);
-
-  let command;
+export async function POST(request) {
   try {
-    command = parseBuildCommand(slackPayload.text, { allowedCustomers });
-  } catch (error) {
-    if (error instanceof BuildCommandValidationError) {
-      return sendJson(response, 200, {
+    // Vercel's Node `req` helpers parse the body; Slack needs the exact raw
+    // string for signature verification. The Web Request API gives it intact.
+    const rawBody = await request.text();
+
+    const isVerified = verifySlackSignature({
+      rawBody,
+      timestamp: request.headers.get("x-slack-request-timestamp"),
+      signature: request.headers.get("x-slack-signature"),
+      signingSecret: process.env.SLACK_SIGNING_SECRET,
+    });
+
+    if (!isVerified) {
+      return jsonResponse(401, {
         response_type: "ephemeral",
-        text: `${error.message}\n\n${buildSlackUsage()}`,
+        text: "Slack signature verification failed.",
       });
     }
 
-    throw error;
+    const slackPayload = Object.fromEntries(new URLSearchParams(rawBody));
+    const allowedCustomers = parseAllowedCustomers(process.env.ALLOWED_CUSTOMERS);
+
+    let command;
+    try {
+      command = parseBuildCommand(slackPayload.text, { allowedCustomers });
+    } catch (error) {
+      if (error instanceof BuildCommandValidationError) {
+        return jsonResponse(200, {
+          response_type: "ephemeral",
+          text: `${error.message}\n\n${buildSlackUsage()}`,
+        });
+      }
+      throw error;
+    }
+
+    waitUntil(triggerBuildAndNotifySlack({ command, slackPayload }));
+
+    return jsonResponse(200, {
+      response_type: "in_channel",
+      text: `Build request accepted: ${formatCommandSummary(command)}.`,
+    });
+  } catch (error) {
+    console.error("Unhandled error in /api/flutter-build", error);
+    return jsonResponse(200, {
+      response_type: "ephemeral",
+      text: `Something went wrong: ${error.message}`,
+    });
   }
-
-  waitUntil(triggerBuildAndNotifySlack({ command, slackPayload }));
-
-  return sendJson(response, 200, {
-    response_type: "in_channel",
-    text: `Build request accepted: ${formatCommandSummary(command)}.`,
-  });
 }
 
 async function triggerBuildAndNotifySlack({ command, slackPayload }) {
@@ -100,18 +114,4 @@ function parseAllowedCustomers(value) {
     .split(",")
     .map((customer) => customer.trim())
     .filter(Boolean);
-}
-
-function sendJson(response, statusCode, payload) {
-  response.status(statusCode).json(payload);
-}
-
-async function readRawBody(request) {
-  const chunks = [];
-
-  for await (const chunk of request) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  }
-
-  return Buffer.concat(chunks).toString("utf8");
 }
