@@ -3,11 +3,15 @@ import { waitUntil } from "@vercel/functions";
 import {
   BuildCommandValidationError,
   buildSlackUsage,
-  formatCommandSummary,
   parseBuildCommand,
 } from "../src/domain/buildCommand.js";
 import { triggerBitriseBuild } from "../src/infrastructure/bitriseClient.js";
 import { verifySlackSignature } from "../src/infrastructure/slackSignature.js";
+import {
+  buildAcknowledgementPayload,
+  buildBitriseErrorPayload,
+  buildBitriseSuccessPayload,
+} from "../src/presentation/slackBuildMessages.js";
 
 function jsonResponse(statusCode, payload) {
   return Response.json(payload, { status: statusCode });
@@ -58,10 +62,14 @@ export async function POST(request) {
 
     waitUntil(triggerBuildAndNotifySlack({ command, slackPayload }));
 
-    return jsonResponse(200, {
-      response_type: "in_channel",
-      text: `Build request accepted: ${formatCommandSummary(command)}.`,
-    });
+    return jsonResponse(
+      200,
+      buildAcknowledgementPayload({
+        command,
+        userId: slackPayload.user_id,
+        userName: slackPayload.user_name,
+      })
+    );
   } catch (error) {
     console.error("Unhandled error in /api/flutter-build", error);
     return jsonResponse(200, {
@@ -79,19 +87,21 @@ async function triggerBuildAndNotifySlack({ command, slackPayload }) {
       command,
     });
 
-    await postSlackResponse(slackPayload.response_url, {
-      response_type: "in_channel",
-      text: build.buildUrl
-        ? `Bitrise build triggered: <${build.buildUrl}|open build>.`
-        : `Bitrise build triggered for ${formatCommandSummary(command)}.`,
-    });
+    await postSlackResponse(
+      slackPayload.response_url,
+      buildBitriseSuccessPayload({
+        command,
+        buildUrl: build.buildUrl,
+        buildNumber: build.buildNumber,
+      })
+    );
   } catch (error) {
     console.error("Failed to trigger Bitrise build", error);
 
-    await postSlackResponse(slackPayload.response_url, {
-      response_type: "ephemeral",
-      text: `Bitrise build trigger failed: ${error.message}`,
-    });
+    await postSlackResponse(
+      slackPayload.response_url,
+      buildBitriseErrorPayload({ message: error.message })
+    );
   }
 }
 
