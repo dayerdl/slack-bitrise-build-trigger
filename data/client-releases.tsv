@@ -12,6 +12,7 @@ Helsinki	2.9.802	2025-11-12	stage	internal review	final pre-launch
 Helsinki	2.9.801	2025-10-24	prod	pre-launch	app-3165; core branding
 LDO / One Wembley Park	2.10.4	2025-10-29	stage	flutter dev	
 Lillenium	2.9.724	2025-11-20	stage		app-3185 ionic→flutter reopened
+Mall of America	4.2.355	2026-05-05	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Mall of America	4.2.354	2026-05-04	pre	bitrise	Slack build — workflow:deployFromSlack branch:development
 Mall of America	4.2.352	2026-05-04	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Mall of America	4.2.353	2026-03-26	prod	not released yet	app-3477 regression prod resolved
