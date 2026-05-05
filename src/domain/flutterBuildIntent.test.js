@@ -50,6 +50,25 @@ test("help intent", () => {
   assert.equal(parseFlutterBuildIntent("help").type, "help");
 });
 
+test("quick deploy intent two words", () => {
+  assert.deepEqual(parseFlutterBuildIntent("moa stage"), {
+    type: "quick_deploy",
+    platformSlug: "moa",
+    buildEnv: "stage",
+  });
+});
+
+test("quick deploy not matched when pipe form", () => {
+  assert.equal(
+    parseFlutterBuildIntent("workflow:deploy | branch:main | ENV[build_env]:stage").type,
+    "build"
+  );
+});
+
+test("quick deploy not matched for invalid env", () => {
+  assert.equal(parseFlutterBuildIntent("moa dev").type, "build");
+});
+
 test("release add and delete intent", () => {
   assert.deepEqual(parseFlutterBuildIntent("release add | client:moa | version:1"), {
     type: "release_add",

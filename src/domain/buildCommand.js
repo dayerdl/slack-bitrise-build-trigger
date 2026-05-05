@@ -1,6 +1,10 @@
 import { formatClientHelpAppendix } from "./coniqClients.js";
 
 const VALID_BUILD_ENVS = new Set(["qa", "pre", "stage", "prod"]);
+
+export function isValidBuildEnv(value) {
+  return VALID_BUILD_ENVS.has(String(value ?? "").trim().toLowerCase());
+}
 const BOOLEAN_ENV_KEYS = new Set(["build_ios", "build_android", "BUILD_IOS", "BUILD_ANDROID"]);
 
 export class BuildCommandValidationError extends Error {
@@ -52,19 +56,35 @@ export function parseBuildCommand(input, options = {}) {
   };
 }
 
-export function buildSlackUsage() {
+export function buildSlackUsage(options = {}) {
+  const backendDeployedAt = String(options.backendDeployedAt ?? "").trim();
+  const backendDeployedLine = backendDeployedAt
+    ? `⏱ Backend deployed: *${backendDeployedAt}*`
+    : "⏱ Backend deployed: _(unknown)_";
+
   return (
     [
-      "Usage:",
-      "",
-      "• `/flutter-build list` or `/flutter-build list all` — all clients and versions.",
-      "• `/flutter-build list bergen` — one client (slug or TSV name).",
-      "• `/flutter-build release add | client:moa | version:4.2.400 | date:2026-05-04 | env:prod | status:released | notes:APP-999` — append a row; set `GITHUB_TOKEN` + `GITHUB_REPOSITORY` when the app cannot write `data/client-releases.tsv` locally.",
-      "• `/flutter-build release delete | client:moa | version:4.2.400` — remove a row; same as add.",
-      "• `/flutter-build workflow:deployFromSlack | branch:development | ENV[build_env]:stage | ENV[platform_account]:liwa | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:0.0.12` — trigger Bitrise (`workflow:deploy` is an alias for `deployFromSlack`).",
-      "Optional: `ENV[build_message]:…` — custom text on the Bitrise build; otherwise a short summary is sent.",
-      "",
+      "*Flutter build / deploy*",
       "Release table: https://github.com/dayerdl/slack-bitrise-build-trigger/blob/main/data/client-releases.tsv",
+      "",
+      "✅ *Quick deploy (recommended)*",
+      "Type two words: `<client> <env>`",
+      "- Example: `/flutter-build moa stage`",
+      "- Looks up the latest `major.minor.patch` version for that client in the release table (env column ignored), bumps patch (e.g. `1.2.4` → `1.2.5`), then asks you to *Confirm*.",
+      "",
+      "🛠️ *Manual deploy (advanced)*",
+      "- `/flutter-build workflow:deployFromSlack | branch:development | ENV[build_env]:stage | ENV[platform_account]:liwa | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:0.0.12`",
+      "- Optional: `ENV[build_message]:…` (text shown on the Bitrise build)",
+      "",
+      "📋 *List versions*",
+      "- `/flutter-build list` (all clients)",
+      "- `/flutter-build list bergen` (filter by slug or name)",
+      "",
+      "🧾 *Edit release table*",
+      "- `/flutter-build release add | client:moa | version:4.2.400 | date:2026-05-04 | env:prod | status:released | notes:APP-999`",
+      "- `/flutter-build release delete | client:moa | version:4.2.400`",
+      "",
+      backendDeployedLine,
     ].join("\n") + formatClientHelpAppendix()
   );
 }
@@ -136,7 +156,7 @@ function validateCommand(fields, env, options) {
   requireValue(env.build_env, "ENV[build_env]");
   requireValue(env.platform_account, "ENV[build_customer] or ENV[platform_account]");
 
-  if (!VALID_BUILD_ENVS.has(env.build_env)) {
+  if (!isValidBuildEnv(env.build_env)) {
     throw new BuildCommandValidationError("ENV[build_env] must be one of: qa, pre, stage, prod.");
   }
 

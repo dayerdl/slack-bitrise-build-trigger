@@ -22,10 +22,23 @@ Optional parameters:
 - `ENV[app_version_major]`, `ENV[app_version_minor]`, `ENV[app_version_patch]`: optional overrides; any other `ENV[...]` is also forwarded to Bitrise.
 - `ENV[build_message]`: optional text shown on the Bitrise build details (API `commit_message`). If omitted, a short summary of the slash command is used instead. This value is not injected as a Bitrise environment variable.
 
+### Quick deploy (short form)
+
+```text
+/flutter-build moa stage
+```
+
+Two words: **platform slug** (must match `ALLOWED_CUSTOMERS`, e.g. `moa`) and **build env** (`qa`, `pre`, `stage`, or `prod`). The app loads `data/client-releases.tsv` (GitHub API when configured, otherwise the bundled file), finds the **latest `major.minor.patch` version across all rows for that client** (the `env` column on those rows is ignored for version lookup—stage, pre, and prod all count), bumps the **patch** (e.g. latest overall `2.0.0` → deploy `2.0.1`), and shows an **ephemeral** message with **Confirm** / **Cancel** buttons. The Bitrise build still uses your chosen **second word** as `ENV[build_env]` (e.g. `moa stage` deploys with `build_env=stage`).
+
+After you click **Confirm**, Bitrise runs workflow `deployFromSlack` on branch `DEFAULT_SLACK_DEPLOY_BRANCH` (default `development`) with `build_version` set to the new patch version.
+
+**Slack app setup:** under *Interactivity & Shortcuts*, set **Interactivity** to On and **Request URL** to `https://<your-deployment>/api/slack-interactive` (same host as the slash command). Use the same **Signing Secret** as for the slash command.
+
 ## Project Structure
 
 ```text
-api/flutter-build.js                     # Vercel request handler
+api/flutter-build.js                     # Slash command handler
+api/slack-interactive.js                 # Button actions (quick deploy confirm/cancel)
 src/domain/buildCommand.js               # Command parsing and validation
 src/infrastructure/bitriseClient.js      # Bitrise API integration
 src/infrastructure/slackSignature.js     # Slack request verification
@@ -42,6 +55,7 @@ SLACK_SIGNING_SECRET=...
 BITRISE_API_TOKEN=...
 BITRISE_APP_SLUG=...
 ALLOWED_CUSTOMERS=whitelabel,tanger,moa,wolfsburg,village,liwa
+DEFAULT_SLACK_DEPLOY_BRANCH=development
 ```
 
 `BITRISE_API_TOKEN` must be a Bitrise personal access token that can trigger builds for `BITRISE_APP_SLUG`.

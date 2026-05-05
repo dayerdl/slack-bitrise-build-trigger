@@ -1,4 +1,18 @@
+import { isValidBuildEnv } from "./buildCommand.js";
+
 const LIST_KEYWORDS = new Set(["list", "clients", "versions"]);
+
+const QUICK_DEPLOY_RESERVED_FIRST = new Set([
+  "help",
+  "list",
+  "clients",
+  "versions",
+  "release",
+  "add",
+  "delete",
+  "remove",
+  "confirm",
+]);
 
 /**
  * Parse slash-command text (Slack omits the `/flutter-build` prefix in `text`).
@@ -53,5 +67,41 @@ export function parseFlutterBuildIntent(text) {
     };
   }
 
+  const quickDeploy = tryParseQuickDeploy(normalized);
+  if (quickDeploy) {
+    return quickDeploy;
+  }
+
   return { type: "build" };
+}
+
+/**
+ * Short form: `<platform_slug> <build_env>` e.g. `moa stage` (no pipes).
+ */
+function tryParseQuickDeploy(normalized) {
+  if (normalized.includes("|")) {
+    return null;
+  }
+
+  const parts = normalized.split(/\s+/).filter(Boolean);
+  if (parts.length !== 2) {
+    return null;
+  }
+
+  const [slugRaw, envRaw] = parts;
+  const envLower = envRaw.toLowerCase();
+  if (!isValidBuildEnv(envLower)) {
+    return null;
+  }
+
+  const firstLower = slugRaw.toLowerCase();
+  if (QUICK_DEPLOY_RESERVED_FIRST.has(firstLower)) {
+    return null;
+  }
+
+  return {
+    type: "quick_deploy",
+    platformSlug: slugRaw.trim(),
+    buildEnv: envLower,
+  };
 }

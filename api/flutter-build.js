@@ -1,27 +1,38 @@
 import { waitUntil } from "@vercel/functions";
 
-import {
-  BuildCommandValidationError,
-  buildSlackUsage,
-  parseBuildCommand,
-} from "../src/domain/buildCommand.js";
+import { executeBitriseDeployWithSlackNotify } from "../src/application/bitriseSlackDeploy.js";
 import {
   executeReleaseAdd,
   executeReleaseDelete,
   ReleaseMutationError,
 } from "../src/application/releaseCommands.js";
+import { loadReleaseRowsForSlack } from "../src/application/releaseRowsLoader.js";
+import {
+  BuildCommandValidationError,
+  buildSlackUsage,
+  parseBuildCommand,
+} from "../src/domain/buildCommand.js";
 import { buildCatalogContext } from "../src/domain/coniqClients.js";
-import { filterRowsByClientQuery, loadClientReleaseRows } from "../src/domain/clientReleases.js";
+import {
+  filterRowsByClientQuery,
+  loadClientReleaseRows,
+} from "../src/domain/clientReleases.js";
 import { parseFlutterBuildIntent } from "../src/domain/flutterBuildIntent.js";
-import { triggerBitriseBuild } from "../src/infrastructure/bitriseClient.js";
+import { QuickDeployError, computeNextPatchFromReleases } from "../src/domain/quickDeploy.js";
+import { signQuickDeployToken } from "../src/infrastructure/quickDeployConfirmToken.js";
 import { verifySlackSignature } from "../src/infrastructure/slackSignature.js";
 import { buildClientListPayload } from "../src/presentation/slackClientList.js";
-import { persistReleaseRowAfterBitriseTrigger } from "../src/application/persistReleaseAfterBuild.js";
+import { buildQuickDeployConfirmationPayload } from "../src/presentation/slackQuickDeploy.js";
 import {
   buildAcknowledgementPayload,
-  buildBitriseErrorPayload,
-  buildBitriseSuccessPayload,
 } from "../src/presentation/slackBuildMessages.js";
+
+const BACKEND_DEPLOYED_AT = new Date();
+
+function formatBackendDeployedAtUtc(d) {
+  const iso = d.toISOString(); // YYYY-MM-DDTHH:mm:ss.sssZ
+  return `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC`;
+}
 
 function jsonResponse(statusCode, payload) {
   return Response.json(payload, { status: statusCode });
@@ -69,7 +80,7 @@ export async function POST(request) {
     if (intent.type === "empty" || intent.type === "help") {
       return jsonResponse(200, {
         response_type: "ephemeral",
-        text: buildSlackUsage(),
+        text: buildSlackUsage({ backendDeployedAt: formatBackendDeployedAtUtc(BACKEND_DEPLOYED_AT) }),
       });
     }
 
@@ -98,6 +109,83 @@ export async function POST(request) {
           text: `Could not load release data: ${error.message}`,
         });
       }
+    }
+
+    if (intent.type === "quick_deploy") {
+      const signingSecret = String(process.env.SLACK_SIGNING_SECRET ?? "").trim();
+      if (!signingSecret) {
+        return jsonResponse(200, {
+          response_type: "ephemeral",
+          text: "Quick deploy requires `SLACK_SIGNING_SECRET` (used to sign the confirmation button).",
+        });
+      }
+
+      const allowedCustomers = parseAllowedCustomers(process.env.ALLOWED_CUSTOMERS);
+      const slugLower = intent.platformSlug.trim().toLowerCase();
+      if (
+        allowedCustomers.length > 0 &&
+        !allowedCustomers.some((c) => c.toLowerCase() === slugLower)
+      ) {
+        return jsonResponse(200, {
+          response_type: "ephemeral",
+          text: `ENV[platform_account] \`${intent.platformSlug}\` is not in ALLOWED_CUSTOMERS.`,
+        });
+      }
+
+      const canonical =
+        allowedCustomers.length > 0
+          ? allowedCustomers.find((c) => c.toLowerCase() === slugLower) ?? intent.platformSlug.trim()
+          : intent.platformSlug.trim();
+
+      let rows;
+      try {
+        rows = await loadReleaseRowsForSlack();
+      } catch (error) {
+        console.error("Quick deploy: failed to load releases", error);
+        return jsonResponse(200, {
+          response_type: "ephemeral",
+          text: `Could not load release table: ${error.message}`,
+        });
+      }
+
+      const catalog = buildCatalogContext();
+      let plan;
+      try {
+        plan = computeNextPatchFromReleases(rows, canonical, intent.buildEnv, catalog);
+      } catch (error) {
+        if (error instanceof QuickDeployError) {
+          return jsonResponse(200, {
+            response_type: "ephemeral",
+            text: error.message,
+          });
+        }
+        throw error;
+      }
+
+      const branch = String(process.env.DEFAULT_SLACK_DEPLOY_BRANCH ?? "").trim() || "development";
+
+      const tokenPayload = {
+        t: Date.now(),
+        workflow: "deployFromSlack",
+        branch,
+        platform_account: canonical,
+        build_env: intent.buildEnv,
+        build_version: plan.nextVersion,
+        previous_version: plan.previousVersion,
+      };
+      const confirmToken = signQuickDeployToken(tokenPayload, signingSecret);
+
+      return jsonResponse(
+        200,
+        buildQuickDeployConfirmationPayload({
+          platformSlug: canonical,
+          buildEnv: intent.buildEnv,
+          previousVersion: plan.previousVersion,
+          nextVersion: plan.nextVersion,
+          branch,
+          confirmToken,
+        })
+      );
     }
 
     if (intent.type === "release_add" || intent.type === "release_delete") {
@@ -135,13 +223,18 @@ export async function POST(request) {
       if (error instanceof BuildCommandValidationError) {
         return jsonResponse(200, {
           response_type: "ephemeral",
-          text: `${error.message}\n\n${buildSlackUsage()}`,
+          text: `${error.message}\n\n${buildSlackUsage({ backendDeployedAt: formatBackendDeployedAtUtc(BACKEND_DEPLOYED_AT) })}`,
         });
       }
       throw error;
     }
 
-    waitUntil(triggerBuildAndNotifySlack({ command, slackPayload }));
+    waitUntil(
+      executeBitriseDeployWithSlackNotify({
+        command,
+        responseUrl: slackPayload.response_url,
+      })
+    );
 
     return jsonResponse(
       200,
@@ -158,55 +251,6 @@ export async function POST(request) {
       text: `Something went wrong: ${error.message}`,
     });
   }
-}
-
-async function triggerBuildAndNotifySlack({ command, slackPayload }) {
-  try {
-    const build = await triggerBitriseBuild({
-      appSlug: process.env.BITRISE_APP_SLUG,
-      apiToken: process.env.BITRISE_API_TOKEN,
-      command,
-    });
-
-    let releaseTsvResult;
-    try {
-      releaseTsvResult = await persistReleaseRowAfterBitriseTrigger(command);
-    } catch (syncError) {
-      console.error("Release TSV sync after Bitrise failed", syncError);
-      releaseTsvResult = { ok: false, reason: "error", message: syncError.message };
-    }
-
-    await postSlackResponse(
-      slackPayload.response_url,
-      buildBitriseSuccessPayload({
-        command,
-        buildUrl: build.buildUrl,
-        buildNumber: build.buildNumber,
-        releaseTsvResult,
-      })
-    );
-  } catch (error) {
-    console.error("Failed to trigger Bitrise build", error);
-
-    await postSlackResponse(
-      slackPayload.response_url,
-      buildBitriseErrorPayload({ message: error.message })
-    );
-  }
-}
-
-async function postSlackResponse(responseUrl, payload) {
-  if (!responseUrl) {
-    return;
-  }
-
-  await fetch(responseUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
 }
 
 function parseAllowedCustomers(value) {

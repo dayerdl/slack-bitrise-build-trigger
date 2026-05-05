@@ -47,6 +47,17 @@ export function parseClientReleasesTsv(content) {
   return rows;
 }
 
+export function getLatestReleaseTableDate(rows) {
+  let best = "";
+  for (const r of rows ?? []) {
+    const d = String(r?.date ?? "").trim();
+    if (d && (!best || d > best)) {
+      best = d;
+    }
+  }
+  return best || null;
+}
+
 /**
  * Group rows by client; sort clients A–Z; within each client sort by date descending.
  */
