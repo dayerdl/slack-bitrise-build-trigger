@@ -76,10 +76,7 @@ export function buildSlackUsage(options = {}) {
     "• Example: `/flutter-build moa stage` — optional message: `/flutter-build moa stage \"testing push notifications\"`",
     "",
     "🔗 *Release table:* https://github.com/dayerdl/slack-bitrise-build-trigger/blob/main/data/client-releases.tsv",
-    "",
-    "✅ *Triggers need:* `workflow`, `branch`, `ENV[build_env]`, `ENV[platform_account]` (folder slug when possible).",
-    "• Allowed `ENV[build_env]`: `qa`, `pre`, `stage`, `prod`.",
-    "• Bitrise also gets `ENV[build_customer]` = same value as `ENV[platform_account]`.",
+    ""
   ];
 
   if (backendDeployedAt) {
