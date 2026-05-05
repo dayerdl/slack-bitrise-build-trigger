@@ -34,6 +34,18 @@ After you click **Confirm**, Bitrise runs workflow `deployFromSlack` on branch `
 
 **Slack app setup:** under *Interactivity & Shortcuts*, set **Interactivity** to On and **Request URL** to `https://<your-deployment>/api/slack-interactive` (same host as the slash command). Use the same **Signing Secret** as for the slash command.
 
+### Updating the release table only after success
+
+To append a row only when the build finishes successfully, set up a **Bitrise outgoing webhook** (event: build finished) pointing to:
+
+`https://<your-deployment>/api/bitrise-webhook`
+
+Add a custom header in Bitrise (outgoing webhook headers):
+
+- `X-Bitrise-Webhook-Secret`: `<your BITRISE_WEBHOOK_SECRET>`
+
+Then set `BITRISE_WEBHOOK_SECRET` in your deployment env vars to the same value.
+
 ## Project Structure
 
 ```text

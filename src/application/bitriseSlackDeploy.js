@@ -1,5 +1,4 @@
 import { triggerBitriseBuild } from "../infrastructure/bitriseClient.js";
-import { persistReleaseRowAfterBitriseTrigger } from "./persistReleaseAfterBuild.js";
 import {
   buildBitriseErrorPayload,
   buildBitriseSuccessPayload,
@@ -27,21 +26,13 @@ export async function executeBitriseDeployWithSlackNotify({ command, responseUrl
       command,
     });
 
-    let releaseTsvResult;
-    try {
-      releaseTsvResult = await persistReleaseRowAfterBitriseTrigger(command);
-    } catch (syncError) {
-      console.error("Release TSV sync after Bitrise failed", syncError);
-      releaseTsvResult = { ok: false, reason: "error", message: syncError.message };
-    }
-
     await postSlackResponse(
       responseUrl,
       buildBitriseSuccessPayload({
         command,
         buildUrl: build.buildUrl,
         buildNumber: build.buildNumber,
-        releaseTsvResult,
+        releaseTsvResult: { ok: false, reason: "pending" },
       })
     );
   } catch (error) {

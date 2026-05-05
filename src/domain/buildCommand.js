@@ -1,11 +1,11 @@
 import { formatClientHelpAppendix } from "./coniqClients.js";
 
 const VALID_BUILD_ENVS = new Set(["qa", "pre", "stage", "prod"]);
+const BOOLEAN_ENV_KEYS = new Set(["build_ios", "build_android"]);
 
 export function isValidBuildEnv(value) {
   return VALID_BUILD_ENVS.has(String(value ?? "").trim().toLowerCase());
 }
-const BOOLEAN_ENV_KEYS = new Set(["build_ios", "build_android", "BUILD_IOS", "BUILD_ANDROID"]);
 
 export class BuildCommandValidationError extends Error {
   constructor(message) {
@@ -38,13 +38,8 @@ export function parseBuildCommand(input, options = {}) {
     fields[key] = normalizeValue(rawValue);
   }
 
-  normalizeBuildAliases(env);
-
-  if (!env.build_ios && !env.BUILD_IOS) {
+  if (!env.build_ios) {
     env.build_ios = "true";
-  }
-  if (!env.build_android && !env.BUILD_ANDROID) {
-    env.build_android = "false";
   }
 
   validateCommand(fields, env, options);
@@ -56,37 +51,42 @@ export function parseBuildCommand(input, options = {}) {
   };
 }
 
+/**
+ * @param {{ backendDeployedAt?: string }} [options]
+ */
 export function buildSlackUsage(options = {}) {
   const backendDeployedAt = String(options.backendDeployedAt ?? "").trim();
-  const backendDeployedLine = backendDeployedAt
-    ? `⏱ Backend deployed: *${backendDeployedAt}*`
-    : "⏱ Backend deployed: _(unknown)_";
 
-  return (
-    [
-      "*Flutter build / deploy*",
-      "Release table: https://github.com/dayerdl/slack-bitrise-build-trigger/blob/main/data/client-releases.tsv",
-      "",
-      "✅ *Quick deploy (recommended)*",
-      "Type two words: `<client> <env>`",
-      "- Example: `/flutter-build moa stage`",
-      "- Looks up the latest `major.minor.patch` version for that client in the release table (env column ignored), bumps patch (e.g. `1.2.4` → `1.2.5`), then asks you to *Confirm*.",
-      "",
-      "🛠️ *Manual deploy (advanced)*",
-      "- `/flutter-build workflow:deployFromSlack | branch:development | ENV[build_env]:stage | ENV[platform_account]:liwa | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:0.0.12`",
-      "- Optional: `ENV[build_message]:…` (text shown on the Bitrise build)",
-      "",
-      "📋 *List versions*",
-      "- `/flutter-build list` (all clients)",
-      "- `/flutter-build list bergen` (filter by slug or name)",
-      "",
-      "🧾 *Edit release table*",
-      "- `/flutter-build release add | client:moa | version:4.2.400 | date:2026-05-04 | env:prod | status:released | notes:APP-999`",
-      "- `/flutter-build release delete | client:moa | version:4.2.400`",
-      "",
-      backendDeployedLine,
-    ].join("\n") + formatClientHelpAppendix()
-  );
+  const body = [
+    "📋 *Flutter build* — quick reference",
+    "",
+    "📚 *List & lookup*",
+    "• `/flutter-build list` or `/flutter-build list all` — all clients and versions.",
+    "• `/flutter-build list bergen` — filter one client (slug or table name).",
+    "",
+    "📝 *Release rows (manual)*",
+    "• `/flutter-build release add | client:moa | version:4.2.400 | date:2026-05-04 | env:prod | status:released | notes:APP-999` — append",
+    "• `/flutter-build release delete | client:moa | version:4.2.400` — remove",
+    "",
+    "🚀 *Full Bitrise trigger* (pipe-separated)",
+    "• `/flutter-build workflow:deploy | branch:master | ENV[build_env]:prod | ENV[platform_account]:tanger | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:8.0.18`",
+    "",
+    "⚡ *Quick deploy* (highest semver across all env rows for that client → bump patch → confirm in Slack)",
+    "• `/flutter-build <client> <env>` — optional commit text in `\"` or `'`",
+    "• Example: `/flutter-build moa stage` — optional message: `/flutter-build moa stage \"testing push notifications\"`",
+    "",
+    "🔗 *Release table:* https://github.com/dayerdl/slack-bitrise-build-trigger/blob/main/data/client-releases.tsv",
+    "",
+    "✅ *Triggers need:* `workflow`, `branch`, `ENV[build_env]`, `ENV[platform_account]` (folder slug when possible).",
+    "• Allowed `ENV[build_env]`: `qa`, `pre`, `stage`, `prod`.",
+    "• Bitrise also gets `ENV[build_customer]` = same value as `ENV[platform_account]`.",
+  ];
+
+  if (backendDeployedAt) {
+    body.push("", `⏱ *Backend deployed:* ${backendDeployedAt}`);
+  }
+
+  return body.join("\n") + formatClientHelpAppendix();
 }
 
 export function formatCommandSummary(command) {
@@ -105,15 +105,20 @@ const BITRISE_COMMIT_MESSAGE_MAX = 500;
  */
 export function formatBitriseTriggerMessage(command) {
   const custom = String(command.env?.build_message ?? "").trim();
-  if (custom) {
-    return truncateUtf16ByLength(custom, BITRISE_COMMIT_MESSAGE_MAX);
-  }
-
   const { build_message: _drop, ...restEnv } = command.env;
-  return truncateUtf16ByLength(
-    `Slack /flutter-build — ${formatCommandSummary({ ...command, env: restEnv })}`,
-    BITRISE_COMMIT_MESSAGE_MAX
-  );
+
+  const meta = [
+    "slack_flutter_build",
+    `platform_account=${String(command.env?.platform_account ?? "").trim()}`,
+    `build_env=${String(command.env?.build_env ?? "").trim()}`,
+    `build_version=${String(command.env?.build_version ?? "").trim()}`,
+  ].join("|");
+
+  const suffix = custom
+    ? ` — ${custom}`
+    : ` — ${formatCommandSummary({ ...command, env: restEnv })}`;
+
+  return truncateUtf16ByLength(`${meta}${suffix}`, BITRISE_COMMIT_MESSAGE_MAX);
 }
 
 function truncateUtf16ByLength(text, maxChars) {
@@ -142,26 +147,14 @@ function normalizeValue(value) {
   return String(value ?? "").trim();
 }
 
-function normalizeBuildAliases(env) {
-  const platformAccount = env.platform_account || env.build_customer;
-  if (platformAccount) {
-    env.platform_account = platformAccount;
-    env.build_customer = platformAccount;
-  }
-}
-
 function validateCommand(fields, env, options) {
   requireValue(fields.workflow, "workflow");
   requireValue(fields.branch, "branch");
   requireValue(env.build_env, "ENV[build_env]");
-  requireValue(env.platform_account, "ENV[build_customer] or ENV[platform_account]");
+  requireValue(env.platform_account, "ENV[platform_account]");
 
   if (!isValidBuildEnv(env.build_env)) {
     throw new BuildCommandValidationError("ENV[build_env] must be one of: qa, pre, stage, prod.");
-  }
-
-  if (env.build_version && !/^\d+\.\d+\.\d+$/.test(env.build_version)) {
-    throw new BuildCommandValidationError("ENV[build_version] must use major.minor.patch format, for example 8.0.18.");
   }
 
   for (const key of BOOLEAN_ENV_KEYS) {

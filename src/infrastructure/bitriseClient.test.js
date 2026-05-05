@@ -18,7 +18,8 @@ test("buildBitriseRequestBody sets commit_message and omits build_message from e
       build_message: "RC for Liwa smoke test",
     },
   });
-  assert.equal(body.build_params.commit_message, "RC for Liwa smoke test");
+  assert.ok(body.build_params.commit_message.includes("slack_flutter_build|"));
+  assert.ok(body.build_params.commit_message.endsWith("— RC for Liwa smoke test"));
   const keys = body.build_params.environments.map((e) => e.mapped_to);
   assert.ok(!keys.includes("build_message"));
 });
@@ -29,7 +30,7 @@ test("buildBitriseRequestBody commit_message defaults when build_message unset",
     branch: "main",
     env: { build_env: "prod", platform_account: "moa", build_version: "1.0.0" },
   });
-  assert.ok(body.build_params.commit_message.includes("Slack /flutter-build"));
+  assert.ok(body.build_params.commit_message.includes("slack_flutter_build|"));
 });
 
 test("resolveBitriseWorkflowId maps deploy to deployFromSlack", () => {
@@ -50,44 +51,6 @@ test("buildBitriseEnvironmentsForApi mirrors platform_account to build_customer"
   });
   assert.equal(env.platform_account, "tanger");
   assert.equal(env.build_customer, "tanger");
-});
-
-test("buildBitriseEnvironmentsForApi maps Slack aliases to Flutter workflow envs", () => {
-  const env = buildBitriseEnvironmentsForApi({
-    workflow: "deploy",
-    branch: "development",
-    env: {
-      build_env: "stage",
-      build_customer: "moa",
-      build_ios: "true",
-      build_android: "false",
-      build_version: "8.0.18",
-    },
-  });
-
-  assert.equal(env.platform_account, "moa");
-  assert.equal(env.build_customer, "moa");
-  assert.equal(env.BUILD_IOS, "true");
-  assert.equal(env.BUILD_ANDROID, "false");
-  assert.equal(env.app_version_major, "8");
-  assert.equal(env.app_version_minor, "0");
-  assert.equal(env.app_version_patch, "18");
-});
-
-test("buildBitriseEnvironmentsForApi includes default platform flags", () => {
-  const env = buildBitriseEnvironmentsForApi({
-    workflow: "deploy",
-    branch: "development",
-    env: {
-      build_env: "stage",
-      platform_account: "moa",
-      build_ios: "true",
-      build_android: "false",
-    },
-  });
-
-  assert.equal(env.BUILD_IOS, "true");
-  assert.equal(env.BUILD_ANDROID, "false");
 });
 
 test("buildBitriseEnvironmentsForApi splits 0.0.12 into app_version_*", () => {

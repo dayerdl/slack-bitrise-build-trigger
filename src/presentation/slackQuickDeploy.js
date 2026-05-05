@@ -16,7 +16,11 @@ export function buildQuickDeployConfirmationPayload({
   nextVersion,
   branch,
   confirmToken,
+  commitMessage,
 }) {
+  const messageLine = String(commitMessage ?? "").trim()
+    ? `\nMessage: _${escapeMrkdwn(String(commitMessage).trim())}_`
+    : "";
   return {
     response_type: "ephemeral",
     replace_original: false,
@@ -29,7 +33,8 @@ export function buildQuickDeployConfirmationPayload({
           text:
             `*Quick deploy* · ${escapeMrkdwn(platformSlug)} · *${escapeMrkdwn(buildEnv)}*\n` +
             `Latest in release table: \`${escapeMrkdwn(previousVersion)}\` → *${escapeMrkdwn(nextVersion)}*\n` +
-            `Branch: \`${escapeMrkdwn(branch)}\` · workflow: \`deployFromSlack\``,
+            `Branch: \`${escapeMrkdwn(branch)}\` · workflow: \`deployFromSlack\`` +
+            messageLine,
         },
       },
       {

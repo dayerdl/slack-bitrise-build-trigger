@@ -71,6 +71,11 @@ export function buildBitriseSuccessPayload({ command, buildUrl, buildNumber, rel
       type: "mrkdwn",
       text: "_`data/client-releases.tsv` updated in the repository._",
     });
+  } else if (releaseTsvResult?.reason === "pending") {
+    contextElements.push({
+      type: "mrkdwn",
+      text: "_Release row will be added after the build finishes successfully._",
+    });
   } else if (releaseTsvResult?.reason === "no_mapping") {
     contextElements.push({
       type: "mrkdwn",

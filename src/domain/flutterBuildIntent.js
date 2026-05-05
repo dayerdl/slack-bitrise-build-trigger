@@ -83,12 +83,12 @@ function tryParseQuickDeploy(normalized) {
     return null;
   }
 
-  const parts = normalized.split(/\s+/).filter(Boolean);
-  if (parts.length !== 2) {
+  const parts = splitArgsRespectingQuotes(normalized);
+  if (parts.length !== 2 && parts.length !== 3) {
     return null;
   }
 
-  const [slugRaw, envRaw] = parts;
+  const [slugRaw, envRaw, messageRaw] = parts;
   const envLower = envRaw.toLowerCase();
   if (!isValidBuildEnv(envLower)) {
     return null;
@@ -103,5 +103,48 @@ function tryParseQuickDeploy(normalized) {
     type: "quick_deploy",
     platformSlug: slugRaw.trim(),
     buildEnv: envLower,
+    commitMessage: messageRaw ? String(messageRaw).trim() : null,
   };
+}
+
+function splitArgsRespectingQuotes(input) {
+  const s = String(input ?? "").trim();
+  const out = [];
+  let i = 0;
+
+  while (i < s.length) {
+    while (i < s.length && /\s/.test(s[i])) {
+      i++;
+    }
+    if (i >= s.length) {
+      break;
+    }
+
+    const ch = s[i];
+    if (ch === "\"" || ch === "'") {
+      const quote = ch;
+      i++;
+      let token = "";
+      while (i < s.length && s[i] !== quote) {
+        token += s[i];
+        i++;
+      }
+      if (i < s.length && s[i] === quote) {
+        i++;
+      }
+      out.push(token);
+      continue;
+    }
+
+    let token = "";
+    while (i < s.length && !/\s/.test(s[i])) {
+      token += s[i];
+      i++;
+    }
+    if (token) {
+      out.push(token);
+    }
+  }
+
+  return out.filter((x) => String(x).length > 0);
 }

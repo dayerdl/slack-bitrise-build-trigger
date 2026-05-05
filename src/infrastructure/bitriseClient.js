@@ -46,59 +46,18 @@ export async function triggerBitriseBuild({ appSlug, apiToken, command, abortSig
   };
 }
 
+/**
+ * Bitrise env vars for the API: mirrors `platform_account` into `build_customer`
+ * so older workflows that still read `build_customer` keep working.
+ */
 export function buildBitriseEnvironmentsForApi(command) {
   const env = { ...command.env };
-  delete env.build_message;
-
-  const account = firstNonEmpty(env.platform_account, env.build_customer);
+  const account = String(env.platform_account ?? "").trim();
   if (account) {
     env.platform_account = account;
     env.build_customer = account;
   }
-
-  const buildIos = firstNonEmpty(env.BUILD_IOS, env.build_ios);
-  if (buildIos) {
-    env.BUILD_IOS = buildIos;
-  }
-
-  const buildAndroid = firstNonEmpty(env.BUILD_ANDROID, env.build_android);
-  if (buildAndroid) {
-    env.BUILD_ANDROID = buildAndroid;
-  }
-
-  const versionParts = splitBuildVersion(env.build_version);
-  if (versionParts) {
-    env.app_version_major ||= versionParts.major;
-    env.app_version_minor ||= versionParts.minor;
-    env.app_version_patch ||= versionParts.patch;
-  }
-
   return env;
-}
-
-function firstNonEmpty(...values) {
-  for (const value of values) {
-    const normalized = String(value ?? "").trim();
-    if (normalized) {
-      return normalized;
-    }
-  }
-  return "";
-}
-
-function splitBuildVersion(value) {
-  const version = String(value ?? "").trim();
-  if (!version) {
-    return null;
-  }
-
-  const [major, minor, ...patchParts] = version.split(".");
-  const patch = patchParts.join(".");
-  if (!major || !minor || !patch) {
-    return null;
-  }
-
-  return { major, minor, patch };
 }
 
 /** Bitrise workflow id; `deploy` is an alias for the Slack-specific workflow. */

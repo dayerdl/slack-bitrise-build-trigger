@@ -55,6 +55,25 @@ test("quick deploy intent two words", () => {
     type: "quick_deploy",
     platformSlug: "moa",
     buildEnv: "stage",
+    commitMessage: null,
+  });
+});
+
+test("quick deploy accepts optional quoted message (double quotes)", () => {
+  assert.deepEqual(parseFlutterBuildIntent('moa stage "this is for testing PN"'), {
+    type: "quick_deploy",
+    platformSlug: "moa",
+    buildEnv: "stage",
+    commitMessage: "this is for testing PN",
+  });
+});
+
+test("quick deploy accepts optional quoted message (single quotes)", () => {
+  assert.deepEqual(parseFlutterBuildIntent("moa stage 'hello world'"), {
+    type: "quick_deploy",
+    platformSlug: "moa",
+    buildEnv: "stage",
+    commitMessage: "hello world",
   });
 });
 

@@ -9,6 +9,7 @@ export function buildCommandFromVerifiedQuickDeploy(verified) {
   const buildEnv = String(verified.build_env ?? "").trim().toLowerCase();
   const version = String(verified.build_version ?? "").trim();
   const prev = String(verified.previous_version ?? "").trim();
+  const customMessage = String(verified.build_message ?? "").trim();
 
   return {
     workflow: String(verified.workflow ?? "deployFromSlack").trim() || "deployFromSlack",
@@ -20,7 +21,8 @@ export function buildCommandFromVerifiedQuickDeploy(verified) {
       build_version: version,
       build_ios: "true",
       build_android: "false",
-      build_message: `Quick deploy ${platform} ${buildEnv} ${version} (from ${prev})`,
+      build_message:
+        customMessage || `Quick deploy ${platform} ${buildEnv} ${version} (from ${prev})`,
     },
   };
 }

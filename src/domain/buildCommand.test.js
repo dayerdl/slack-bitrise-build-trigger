@@ -3,13 +3,14 @@ import test from "node:test";
 
 import {
   BuildCommandValidationError,
+  buildSlackUsage,
   formatBitriseTriggerMessage,
   parseBuildCommand,
 } from "./buildCommand.js";
 
 test("parses a full Slack build command", () => {
   const command = parseBuildCommand(
-    "/flutter-build workflow:deploy | branch:master | ENV[build_env]:prod | ENV[build_customer]:tanger | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:8.0.18",
+    "/flutter-build workflow:deploy | branch:master | ENV[build_env]:prod | ENV[platform_account]:tanger | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:8.0.18",
     { allowedCustomers: ["tanger"] }
   );
 
@@ -18,7 +19,6 @@ test("parses a full Slack build command", () => {
     branch: "master",
     env: {
       build_env: "prod",
-      build_customer: "tanger",
       platform_account: "tanger",
       build_ios: "true",
       build_android: "false",
@@ -27,41 +27,15 @@ test("parses a full Slack build command", () => {
   });
 });
 
-test("accepts platform_account directly", () => {
-  const command = parseBuildCommand(
-    "workflow:deploy | branch:master | ENV[build_env]:prod | ENV[platform_account]:tanger",
-    { allowedCustomers: ["tanger"] }
-  );
-
-  assert.equal(command.env.platform_account, "tanger");
-  assert.equal(command.env.build_customer, "tanger");
-});
-
 test("defaults build_ios to true when omitted", () => {
   const command = parseBuildCommand("workflow:deploy | branch:master | ENV[build_env]:qa | ENV[platform_account]:moa");
 
   assert.equal(command.env.build_ios, "true");
 });
 
-test("defaults build_android to false when omitted", () => {
-  const command = parseBuildCommand("workflow:deploy | branch:master | ENV[build_env]:qa | ENV[platform_account]:moa");
-
-  assert.equal(command.env.build_android, "false");
-});
-
 test("rejects invalid build environments", () => {
   assert.throws(
     () => parseBuildCommand("workflow:deploy | branch:master | ENV[build_env]:dev | ENV[platform_account]:moa"),
-    BuildCommandValidationError
-  );
-});
-
-test("rejects invalid build versions", () => {
-  assert.throws(
-    () =>
-      parseBuildCommand(
-        "workflow:deploy | branch:master | ENV[build_env]:stage | ENV[build_customer]:moa | ENV[build_version]:8.0"
-      ),
     BuildCommandValidationError
   );
 });
@@ -77,7 +51,11 @@ test("formatBitriseTriggerMessage uses ENV build_message when set", () => {
       build_message: "Custom title only",
     },
   };
-  assert.equal(formatBitriseTriggerMessage(command), "Custom title only");
+  const msg = formatBitriseTriggerMessage(command);
+  assert.ok(msg.includes("platform_account=liwa"));
+  assert.ok(msg.includes("build_env=stage"));
+  assert.ok(msg.includes("build_version=0.0.12"));
+  assert.ok(msg.endsWith("— Custom title only"));
 });
 
 test("formatBitriseTriggerMessage omits build_message from default summary", () => {
@@ -87,9 +65,19 @@ test("formatBitriseTriggerMessage omits build_message from default summary", () 
     env: { build_env: "prod", platform_account: "moa", build_version: "1.0.0" },
   };
   const msg = formatBitriseTriggerMessage(command);
-  assert.ok(msg.startsWith("Slack /flutter-build —"));
+  assert.ok(msg.startsWith("slack_flutter_build|"));
   assert.ok(msg.includes("platform_account=moa"));
   assert.ok(!msg.includes("build_message"));
+});
+
+test("buildSlackUsage includes emoji sections and optional backend time", () => {
+  const base = buildSlackUsage();
+  assert.ok(base.includes("📚"));
+  assert.ok(base.includes("⚡"));
+
+  const withTime = buildSlackUsage({ backendDeployedAt: "2026-05-05 12:00 UTC" });
+  assert.ok(withTime.includes("⏱"));
+  assert.ok(withTime.includes("2026-05-05 12:00 UTC"));
 });
 
 test("rejects customers outside the configured allow list", () => {
