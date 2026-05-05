@@ -5,14 +5,17 @@ Bergen Town Centre	3.0.14	2025-11-19	stage
 Bergen Town Centre	3.0.13	2025-11-18	stage		
 Bergen Town Centre	3.0.12	2025-11-06	stage	internal review	single-tier TRP app-3146
 Bergen Town Centre	3.0.10	2025-10-16	stage	feedback	app-2841 regression 3.0.9 resolved
+Helsinki	2.9.805	2026-05-05	prod	bitrise	Slack build — workflow:deployFromSlack branch:development
 Helsinki	2.9.804	2025-11-27	prod	released	
 Helsinki	2.9.803	2025-11-13	stage		app-3165 stage final approval resolved
 Helsinki	2.9.802	2025-11-12	stage	internal review	final pre-launch
 Helsinki	2.9.801	2025-10-24	prod	pre-launch	app-3165; core branding
 LDO / One Wembley Park	2.10.4	2025-10-29	stage	flutter dev	
 Lillenium	2.9.724	2025-11-20	stage		app-3185 ionic→flutter reopened
-Mall of America	1.2.3	2026-05-04	stage	bitrise	Slack build — workflow:deploy branch:development
-Mall of America	0.0.1	2026-05-04	stage	bitrise	Slack build — workflow:deploy branch:development
+Mall of America	4.3.6	2026-05-05	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Mall of America	4.2.355	2026-05-05	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Mall of America	4.2.354	2026-05-04	pre	bitrise	Slack build — workflow:deployFromSlack branch:development
+Mall of America	4.2.352	2026-05-04	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Mall of America	4.2.353	2026-03-26	prod	not released yet	app-3477 regression prod resolved
 Mall of America	4.2.351	2026-03-24	stage		app-3436 regression stage resolved
 Mall of America	4.2.326	2025-12-01	prod	released	app-3238 hotfix icons map
