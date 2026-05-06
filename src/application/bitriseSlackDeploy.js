@@ -18,7 +18,12 @@ export async function postSlackResponse(responseUrl, payload) {
   });
 }
 
-export async function executeBitriseDeployWithSlackNotify({ command, responseUrl }) {
+export async function executeBitriseDeployWithSlackNotify({
+  command,
+  responseUrl,
+  userId,
+  userName,
+}) {
   try {
     const build = await triggerBitriseBuild({
       appSlug: process.env.BITRISE_APP_SLUG,
@@ -33,6 +38,8 @@ export async function executeBitriseDeployWithSlackNotify({ command, responseUrl
         buildUrl: build.buildUrl,
         buildNumber: build.buildNumber,
         releaseTsvResult: { ok: false, reason: "pending" },
+        userId,
+        userName,
       })
     );
   } catch (error) {

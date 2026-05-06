@@ -39,9 +39,14 @@ test("Bitrise success payload mentions TSV when releaseTsvResult ok", () => {
     buildUrl: "https://example.com/build",
     buildNumber: 42,
     releaseTsvResult: { ok: true },
+    userId: "U999",
+    userName: "qa",
   });
   const ctx = payload.blocks.find((b) => b.type === "context");
   assert.ok(ctx);
   const text = JSON.stringify(ctx.elements);
   assert.ok(text.includes("client-releases.tsv"));
+  assert.ok(text.includes("U999"));
+  assert.ok(text.includes("Triggered by"));
+  assert.ok(payload.text.includes("Triggered by"));
 });

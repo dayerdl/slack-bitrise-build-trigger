@@ -87,6 +87,8 @@ export async function POST(request) {
         executeBitriseDeployWithSlackNotify({
           command,
           responseUrl: outer.response_url,
+          userId: outer.user?.id,
+          userName: outer.user?.username ?? outer.user?.name,
         })
       );
 

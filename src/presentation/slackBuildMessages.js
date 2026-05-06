@@ -53,8 +53,16 @@ export function buildAcknowledgementPayload({ command, userId, userName }) {
   };
 }
 
-export function buildBitriseSuccessPayload({ command, buildUrl, buildNumber, releaseTsvResult }) {
+export function buildBitriseSuccessPayload({
+  command,
+  buildUrl,
+  buildNumber,
+  releaseTsvResult,
+  userId,
+  userName,
+}) {
   const summaryLine = formatCommandSummary(command);
+  const actor = formatActor(userId, userName);
   const linkText = buildUrl
     ? `<${buildUrl}|Open build in Bitrise>`
     : "Build was triggered on Bitrise.";
@@ -64,7 +72,10 @@ export function buildBitriseSuccessPayload({ command, buildUrl, buildNumber, rel
       ? `Build running (#${buildNumber})`
       : "Build running on Bitrise";
 
-  const contextElements = [{ type: "mrkdwn", text: summaryLine }];
+  const contextElements = [
+    { type: "mrkdwn", text: `Triggered by ${actor}` },
+    { type: "mrkdwn", text: summaryLine },
+  ];
 
   if (releaseTsvResult?.ok) {
     contextElements.push({
@@ -95,7 +106,7 @@ export function buildBitriseSuccessPayload({ command, buildUrl, buildNumber, rel
 
   return {
     response_type: "in_channel",
-    text: `Bitrise build started — ${buildUrl ?? summaryLine}`,
+    text: `Bitrise build started — ${buildUrl ?? summaryLine} · Triggered by ${actor}`,
     blocks: [
       {
         type: "header",
