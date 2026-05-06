@@ -23,20 +23,37 @@ export async function POST(request) {
       return Response.json({ ok: false, message: "Missing build_slug" }, { status: 400 });
     }
 
+    console.info("[bitrise-webhook] received", {
+      build_slug: buildSlug,
+      app_slug: appSlug ? "(provided)" : "(missing)",
+    });
+
     const build = await getBitriseBuild({
       appSlug,
       apiToken: process.env.BITRISE_API_TOKEN,
       buildSlug,
     });
 
-    // status: 1 successful, 4 aborted with success
-    if (build?.status !== 1 && build?.status !== 4) {
-      return Response.json({ ok: true, skipped: true, reason: "not_success", status: build?.status });
-    }
+    // Intentionally ignore `build.status` so this endpoint can run from a workflow step
+    // even when Bitrise's build status is still "in progress" in the API.
 
     const meta = parseBitriseCommitMessageMetadata(build?.commit_message);
     if (!meta) {
-      return Response.json({ ok: true, skipped: true, reason: "no_metadata" });
+      console.warn("[bitrise-webhook] rejected (no_metadata)", {
+        build_slug: buildSlug,
+        triggered_workflow: build?.triggered_workflow,
+        has_commit_message: Boolean(String(build?.commit_message ?? "").trim()),
+        commit_message_head: String(build?.commit_message ?? "").trim().slice(0, 120),
+      });
+      return Response.json(
+        {
+          ok: false,
+          reason: "no_metadata",
+          message:
+            "Build commit_message did not include slack metadata. This webhook only persists releases for builds triggered by /flutter-build (commit_message starts with 'slack_flutter_build|').",
+        },
+        { status: 422 }
+      );
     }
 
     const command = {
@@ -50,7 +67,27 @@ export async function POST(request) {
     };
 
     const result = await persistReleaseRowAfterBitriseTrigger(command);
-    return Response.json({ ok: true, persisted: result });
+    if (!result?.ok) {
+      console.warn("[bitrise-webhook] persist failed", {
+        build_slug: buildSlug,
+        reason: result?.reason,
+        platform_account: meta.platform_account,
+        build_env: meta.build_env,
+        build_version: meta.build_version,
+      });
+      return Response.json(
+        { ok: false, reason: result?.reason ?? "persist_failed", persisted: result },
+        { status: 422 }
+      );
+    }
+
+    console.info("[bitrise-webhook] persisted", {
+      build_slug: buildSlug,
+      platform_account: meta.platform_account,
+      build_env: meta.build_env,
+      build_version: meta.build_version,
+    });
+    return Response.json({ ok: true, persisted: result }, { status: 200 });
   } catch (error) {
     console.error("bitrise webhook failed", error);
     return Response.json({ ok: false, message: error.message }, { status: 500 });

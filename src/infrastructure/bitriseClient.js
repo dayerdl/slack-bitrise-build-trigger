@@ -52,11 +52,29 @@ export async function triggerBitriseBuild({ appSlug, apiToken, command, abortSig
  */
 export function buildBitriseEnvironmentsForApi(command) {
   const env = { ...command.env };
+
+  // `ENV[build_message]` is used to build Bitrise `commit_message`, but it is not a build env var.
+  if (Object.prototype.hasOwnProperty.call(env, "build_message")) {
+    delete env.build_message;
+  }
+
   const account = String(env.platform_account ?? "").trim();
   if (account) {
     env.platform_account = account;
     env.build_customer = account;
   }
+
+  // Derive `app_version_*` from `build_version` when not already set.
+  const buildVersion = String(env.build_version ?? "").trim();
+  if (buildVersion && !env.app_version_major && !env.app_version_minor && !env.app_version_patch) {
+    const m = buildVersion.match(/^(\d+)\.(\d+)\.(\d+)$/);
+    if (m) {
+      env.app_version_major = m[1];
+      env.app_version_minor = m[2];
+      env.app_version_patch = m[3];
+    }
+  }
+
   return env;
 }
 
