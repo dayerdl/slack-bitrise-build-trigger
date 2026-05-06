@@ -20,7 +20,7 @@ export function buildCommandFromVerifiedQuickDeploy(verified) {
       build_customer: platform,
       build_version: version,
       build_ios: "true",
-      build_android: "false",
+      build_android: "true",
       build_message:
         customMessage || `Quick deploy ${platform} ${buildEnv} ${version} (from ${prev})`,
     },

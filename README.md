@@ -30,7 +30,7 @@ Optional parameters:
 
 Two words: **platform slug** (must match `ALLOWED_CUSTOMERS`, e.g. `moa`) and **build env** (`qa`, `pre`, `stage`, or `prod`). The app loads `data/client-releases.tsv` (GitHub API when configured, otherwise the bundled file), finds the **latest `major.minor.patch` version across all rows for that client** (the `env` column on those rows is ignored for version lookup—stage, pre, and prod all count), bumps the **patch** (e.g. latest overall `2.0.0` → deploy `2.0.1`), and shows an **ephemeral** message with **Confirm** / **Cancel** buttons. The Bitrise build still uses your chosen **second word** as `ENV[build_env]` (e.g. `moa stage` deploys with `build_env=stage`).
 
-After you click **Confirm**, Bitrise runs workflow `deployFromSlack` on branch `DEFAULT_SLACK_DEPLOY_BRANCH` (default `development`) with `build_version` set to the new patch version.
+After you click **Confirm**, Bitrise runs workflow `deployFromSlack` on branch `DEFAULT_SLACK_DEPLOY_BRANCH` (default `development`) with `build_version` set to the new patch version. Quick deploy sets both `build_ios` and `build_android` to `true`.
 
 **Slack app setup:** under *Interactivity & Shortcuts*, set **Interactivity** to On and **Request URL** to `https://<your-deployment>/api/slack-interactive` (same host as the slash command). Use the same **Signing Secret** as for the slash command.
 
