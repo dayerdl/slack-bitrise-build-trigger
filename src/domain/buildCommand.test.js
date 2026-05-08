@@ -70,6 +70,18 @@ test("formatBitriseTriggerMessage omits build_message from default summary", () 
   assert.ok(!msg.includes("build_message"));
 });
 
+test("formatBitriseTriggerMessage includes Slack actor when provided", () => {
+  const command = {
+    workflow: "deployFromSlack",
+    branch: "main",
+    env: { build_env: "prod", platform_account: "moa", build_version: "1.0.0" },
+    actor: { userId: "U123", userName: "dev" },
+  };
+  const msg = formatBitriseTriggerMessage(command);
+  assert.ok(msg.includes("slack_user_id=U123"));
+  assert.ok(msg.includes("slack_user_name=dev"));
+});
+
 test("buildSlackUsage includes emoji sections and optional backend time", () => {
   const base = buildSlackUsage();
   assert.ok(base.includes("📚"));

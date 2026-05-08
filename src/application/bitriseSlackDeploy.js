@@ -25,10 +25,15 @@ export async function executeBitriseDeployWithSlackNotify({
   userName,
 }) {
   try {
+    const commandWithActor = {
+      ...command,
+      actor: { userId, userName },
+    };
+
     const build = await triggerBitriseBuild({
       appSlug: process.env.BITRISE_APP_SLUG,
       apiToken: process.env.BITRISE_API_TOKEN,
-      command,
+      command: commandWithActor,
     });
 
     await postSlackResponse(

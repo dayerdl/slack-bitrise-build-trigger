@@ -104,12 +104,19 @@ export function formatBitriseTriggerMessage(command) {
   const custom = String(command.env?.build_message ?? "").trim();
   const { build_message: _drop, ...restEnv } = command.env;
 
+  const actorUserId = String(command?.actor?.userId ?? "").trim();
+  const actorUserName = String(command?.actor?.userName ?? "").trim();
+
   const meta = [
     "slack_flutter_build",
     `platform_account=${String(command.env?.platform_account ?? "").trim()}`,
     `build_env=${String(command.env?.build_env ?? "").trim()}`,
     `build_version=${String(command.env?.build_version ?? "").trim()}`,
-  ].join("|");
+    actorUserId ? `slack_user_id=${actorUserId}` : null,
+    actorUserName ? `slack_user_name=${actorUserName}` : null,
+  ]
+    .filter(Boolean)
+    .join("|");
 
   const suffix = custom
     ? ` — ${custom}`
