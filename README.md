@@ -54,6 +54,8 @@ api/slack-interactive.js                 # Button actions (quick deploy confirm/
 src/domain/buildCommand.js               # Command parsing and validation
 src/infrastructure/bitriseClient.js      # Bitrise API integration
 src/infrastructure/slackSignature.js     # Slack request verification
+data/client_slug_to_tsv.json             # Coniq folder slug → `client-releases.tsv` client column
+data/client_slug_to_app_name.json        # Optional: Coniq folder slug → user-facing app/program name (shown in help)
 ```
 
 The view/request layer is intentionally thin. Command rules live in the domain module, and the Bitrise API call is isolated behind an infrastructure module.

@@ -6,6 +6,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const DEFAULT_CONIQ_SLUGS_PATH = join(__dirname, "../../data/coniq_client_folders.txt");
 export const DEFAULT_SLUG_TO_TSV_PATH = join(__dirname, "../../data/client_slug_to_tsv.json");
+export const DEFAULT_SLUG_TO_APP_NAME_PATH = join(
+  __dirname,
+  "../../data/client_slug_to_app_name.json"
+);
 export const DEFAULT_BUILD_CUSTOMER_TO_TSV_PATH = join(
   __dirname,
   "../../data/build_customer_to_tsv_client.json"
@@ -35,6 +39,20 @@ export function loadBuildCustomerToTsvMap(path = DEFAULT_BUILD_CUSTOMER_TO_TSV_P
   }
 }
 
+/**
+ * Coniq folder slug → user-facing app/program name (e.g. `wolfsburg` → `Designer Outlets Wolfsburg`).
+ * Used only for presentation; lookups against `client-releases.tsv` keep using `loadSlugToTsvMap`.
+ * @returns {Record<string, string>}
+ */
+export function loadSlugToAppNameMap(path = DEFAULT_SLUG_TO_APP_NAME_PATH) {
+  try {
+    const raw = readFileSync(path, "utf8");
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
 export function buildCatalogContext() {
   const slugs = loadConiqClientSlugs();
   const slugToTsv = loadSlugToTsvMap();
@@ -48,20 +66,34 @@ export function formatClientHelpAppendix() {
   try {
     const slugs = loadConiqClientSlugs();
     const map = loadSlugToTsvMap();
+    const appNames = loadSlugToAppNameMap();
     if (slugs.length === 0) {
       return "";
     }
 
     const lines = slugs.map((slug) => {
       const display = map[slug];
-      if (display) {
-        return `• \`${slug}\` — ${display}`;
+      if (!display) {
+        return `• \`${slug}\` — _(add display name in \`client_slug_to_tsv.json\`)_`;
       }
-      return `• \`${slug}\` — _(add display name in \`client_slug_to_tsv.json\`)_`;
+      return `• \`${slug}\` — ${formatClientLabel(display, appNames[slug])}`;
     });
 
     return `\n\n*Clients* _(folder slug → \`client-releases.tsv\` name)_\n${lines.join("\n")}`;
   } catch {
     return "";
   }
+}
+
+function formatClientLabel(tsvName, appName) {
+  const tsv = String(tsvName ?? "").trim();
+  const app = String(appName ?? "").trim();
+  if (!app) {
+    return tsv;
+  }
+  // Skip the slash suffix when the TSV name already contains the app name (e.g. `LDO / One Wembley Park`).
+  if (tsv.toLowerCase().includes(app.toLowerCase())) {
+    return tsv;
+  }
+  return `${tsv} / ${app}`;
 }
