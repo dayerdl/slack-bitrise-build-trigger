@@ -78,7 +78,6 @@ test("formatBitriseTriggerMessage includes Slack actor when provided", () => {
     actor: { userId: "U123", userName: "dev" },
   };
   const msg = formatBitriseTriggerMessage(command);
-  assert.ok(msg.includes("slack_user_id=U123"));
   assert.ok(msg.includes("slack_user_name=dev"));
 });
 

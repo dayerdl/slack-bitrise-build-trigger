@@ -148,11 +148,12 @@ export function buildBitriseErrorPayload({ message }) {
 }
 
 function formatActor(userId, userName) {
-  if (userId) {
-    return `<@${userId}>`;
-  }
   if (userName) {
     return `@${userName}`;
+  }
+  // Fall back to an ID-based mention only when a username is unavailable.
+  if (userId) {
+    return `<@${userId}>`;
   }
   return "Someone";
 }

@@ -25,7 +25,7 @@ test("ack payload includes in_channel and blocks", () => {
   assert.equal(payload.response_type, "in_channel");
   assert.ok(Array.isArray(payload.blocks));
   assert.ok(payload.text.includes("Flutter build queued"));
-  assert.ok(payload.text.includes("U123") || payload.blocks.some((b) => JSON.stringify(b).includes("U123")));
+  assert.ok(payload.text.includes("@dev") || payload.blocks.some((b) => JSON.stringify(b).includes("@dev")));
 });
 
 test("Bitrise success payload mentions TSV when releaseTsvResult ok", () => {
@@ -46,7 +46,7 @@ test("Bitrise success payload mentions TSV when releaseTsvResult ok", () => {
   assert.ok(ctx);
   const text = JSON.stringify(ctx.elements);
   assert.ok(text.includes("client-releases.tsv"));
-  assert.ok(text.includes("U999"));
+  assert.ok(text.includes("@qa"));
   assert.ok(text.includes("Triggered by"));
   assert.ok(payload.text.includes("Triggered by"));
 });
