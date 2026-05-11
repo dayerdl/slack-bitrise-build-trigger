@@ -101,7 +101,7 @@ function tryParseQuickDeploy(normalized) {
 
   return {
     type: "quick_deploy",
-    platformSlug: slugRaw.trim(),
+    platformSlug: slugRaw.trim().toLowerCase(),
     buildEnv: envLower,
     commitMessage: messageRaw ? String(messageRaw).trim() : null,
   };

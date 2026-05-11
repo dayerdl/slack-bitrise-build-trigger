@@ -42,6 +42,10 @@ export function parseBuildCommand(input, options = {}) {
     env.build_ios = "true";
   }
 
+  if (env.platform_account) {
+    env.platform_account = env.platform_account.toLowerCase();
+  }
+
   validateCommand(fields, env, options);
 
   return {
@@ -166,7 +170,7 @@ function validateCommand(fields, env, options) {
   }
 
   const allowedCustomers = options.allowedCustomers ?? [];
-  if (allowedCustomers.length > 0 && !allowedCustomers.includes(env.platform_account)) {
+  if (allowedCustomers.length > 0 && !allowedCustomers.some((c) => c.toLowerCase() === env.platform_account.toLowerCase())) {
     throw new BuildCommandValidationError(
       `ENV[platform_account] must be one of: ${allowedCustomers.join(", ")}.`
     );
