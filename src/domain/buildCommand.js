@@ -1,7 +1,7 @@
 import { formatClientHelpAppendix } from "./coniqClients.js";
 
 const VALID_BUILD_ENVS = new Set(["qa", "pre", "stage", "prod"]);
-const BOOLEAN_ENV_KEYS = new Set(["build_ios", "build_android"]);
+const BOOLEAN_ENV_KEYS = new Set(["build_ios", "build_android", "build_debug"]);
 
 export function isValidBuildEnv(value) {
   return VALID_BUILD_ENVS.has(String(value ?? "").trim().toLowerCase());
@@ -74,6 +74,7 @@ export function buildSlackUsage(options = {}) {
     "",
     "🚀 *Full Bitrise trigger* (pipe-separated)",
     "• `/flutter-build workflow:deploy | branch:master | ENV[build_env]:prod | ENV[platform_account]:tanger | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:8.0.18`",
+    "• Optional: `ENV[build_debug]:true` — builds a debug APK/IPA instead of release.",
     "",
     "⚡ *Quick deploy* (highest semver across all env rows for that client → bump patch → confirm in Slack)",
     "• `/flutter-build <client> <env>` — optional commit text in `\"` or `'`",
