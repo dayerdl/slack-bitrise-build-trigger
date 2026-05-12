@@ -76,3 +76,26 @@ test("buildBitriseEnvironmentsForApi leaves build_customer unset when platform_a
   });
   assert.equal(env.build_customer, undefined);
 });
+
+test("buildBitriseRequestBody forwards Slack actor to Bitrise env and triggered_by", () => {
+  const body = buildBitriseRequestBody({
+    workflow: "deployFromSlack",
+    branch: "development",
+    env: {
+      build_env: "stage",
+      platform_account: "moa",
+      build_version: "4.3.26",
+    },
+    actor: {
+      userId: "U0951HFVDUJ",
+      userName: "david.dayer",
+    },
+  });
+
+  const env = Object.fromEntries(
+    body.build_params.environments.map((item) => [item.mapped_to, item.value])
+  );
+  assert.equal(env.slack_triggered_by_user_id, "U0951HFVDUJ");
+  assert.equal(env.slack_triggered_by_user_name, "david.dayer");
+  assert.equal(body.triggered_by, "david.dayer");
+});

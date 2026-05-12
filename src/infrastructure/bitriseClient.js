@@ -58,6 +58,15 @@ export function buildBitriseEnvironmentsForApi(command) {
     delete env.build_message;
   }
 
+  const actorUserId = String(command.actor?.userId ?? "").trim();
+  const actorUserName = String(command.actor?.userName ?? "").trim();
+  if (actorUserId && !env.slack_triggered_by_user_id) {
+    env.slack_triggered_by_user_id = actorUserId;
+  }
+  if (actorUserName && !env.slack_triggered_by_user_name) {
+    env.slack_triggered_by_user_name = actorUserName;
+  }
+
   const account = String(env.platform_account ?? "").trim();
   if (account) {
     env.platform_account = account;
@@ -86,6 +95,11 @@ export function resolveBitriseWorkflowId(workflow) {
 
 export function buildBitriseRequestBody(command) {
   const env = buildBitriseEnvironmentsForApi(command);
+  const actor =
+    String(command.actor?.userName ?? "").trim() ||
+    String(command.actor?.userId ?? "").trim() ||
+    "slack-build-iqc-vercel";
+
   return {
     hook_info: {
       type: "bitrise",
@@ -100,7 +114,7 @@ export function buildBitriseRequestBody(command) {
         is_expand: false,
       })),
     },
-    triggered_by: "slack-build-iqc-vercel",
+    triggered_by: actor,
   };
 }
 
