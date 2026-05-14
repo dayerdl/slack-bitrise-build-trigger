@@ -23,6 +23,7 @@ LIWA	0.0.17	2026-05-07	stage	bitrise	Slack build — workflow:deployFromSlack br
 LIWA	0.0.16	2026-05-07	stage	bitrise	Slack build — workflow:deployFromSlack branch:liwa-flutter-app
 LIWA	0.0.15	2026-05-06	stage	bitrise	Slack build — workflow:deployFromSlack branch:liwa-flutter-app
 LIWA	0.0.13	2026-05-06	stage	released	
+Mall of America	4.3.28	2026-05-14	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-10-moa
 Mall of America	4.3.27	2026-05-13	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Mall of America	4.3.26	2026-05-12	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Mall of America	4.3.25	2026-05-12	pre	bitrise	Slack build — workflow:deployFromSlack branch:development
