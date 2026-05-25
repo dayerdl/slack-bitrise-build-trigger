@@ -79,6 +79,7 @@ VIA BSFO	1.12.47	2025-12-17	stage	flutter team
 VIA BSFO	1.12.44	2025-11-24	prod	released	app-3182 updated build done
 VIA BSFO	1.13.1 (Android)	2025-11-12	pre	internal review	google wallet pass testing
 VIA BSFO	1.12.42	2025-10-15	stage		
+Village Market	2.9.708	2026-05-25	prod	bitrise	Slack build — workflow:deployFromSlack branch:development
 Village Market	2.9.707	2026-04-14	prod		app-3466 smoke prod resolved
 Village Market	2.9.706	2025-11-28	prod	released	
 Village Market	2.9.703	2025-10-22	stage	flutter team	
