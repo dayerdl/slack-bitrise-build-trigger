@@ -17,6 +17,7 @@ LDO / One Wembley Park	2.10.9	2026-05-06	stage	bitrise	Slack build — workflow:
 LDO / One Wembley Park	2.10.8	2026-05-06	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 LDO / One Wembley Park	2.10.7	2026-03-30	stage	released	
 LDO / One Wembley Park	2.10.4	2025-10-29	stage	flutter dev	
+Lillenium	2.9.729	2026-06-03	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Lillenium	2.9.728	2026-06-01	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Lillenium	2.9.727	2026-06-01	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Lillenium	2.9.726	2026-05-26	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
