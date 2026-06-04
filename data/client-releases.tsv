@@ -11,17 +11,37 @@ Helsinki	2.9.804	2025-11-27	prod	released
 Helsinki	2.9.803	2025-11-13	stage		app-3165 stage final approval resolved
 Helsinki	2.9.802	2025-11-12	stage	internal review	final pre-launch
 Helsinki	2.9.801	2025-10-24	prod	pre-launch	app-3165; core branding
+LDO / One Wembley Park	2.10.11	2026-05-25	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 LDO / One Wembley Park	2.10.10	2026-05-07	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/rc-sprint-26-09
 LDO / One Wembley Park	2.10.9	2026-05-06	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 LDO / One Wembley Park	2.10.8	2026-05-06	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 LDO / One Wembley Park	2.10.7	2026-03-30	stage	released	
 LDO / One Wembley Park	2.10.4	2025-10-29	stage	flutter dev	
+Lillenium	2.9.729	2026-06-03	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Lillenium	2.9.728	2026-06-01	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Lillenium	2.9.727	2026-06-01	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Lillenium	2.9.726	2026-05-26	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Lillenium	2.9.724	2025-11-20	stage		app-3185 ionic→flutter reopened
+LIWA	0.0.19	2026-05-13	stage	bitrise	Slack build — workflow:deployFromSlack branch:liwa-flutter-app
 LIWA	0.0.18	2026-05-11	stage	bitrise	Slack build — workflow:deployFromSlack branch:liwa-flutter-app
 LIWA	0.0.17	2026-05-07	stage	bitrise	Slack build — workflow:deployFromSlack branch:liwa-flutter-app
 LIWA	0.0.16	2026-05-07	stage	bitrise	Slack build — workflow:deployFromSlack branch:liwa-flutter-app
 LIWA	0.0.15	2026-05-06	stage	bitrise	Slack build — workflow:deployFromSlack branch:liwa-flutter-app
 LIWA	0.0.13	2026-05-06	stage	released	
+Mall of America	4.3.39	2026-06-03	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Mall of America	4.3.38	2026-06-01	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Mall of America	4.3.37	2026-05-22	prod	bitrise	Slack build — workflow:deployFromSlack branch:development
+Mall of America	4.3.36	2026-05-21	prod	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-10-moa
+Mall of America	4.3.35	2026-05-20	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-10-moa
+Mall of America	4.3.34	2026-05-19	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-10-moa
+Mall of America	4.3.33	2026-05-15	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-10-moa
+Mall of America	4.3.32	2026-05-15	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-10-moa
+Mall of America	4.3.31	2026-05-15	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-10-moa
+Mall of America	4.3.30	2026-05-15	stage	bitrise	Slack build — workflow:deployFromSlack branch:fix-for-dates-moa-release
+Mall of America	4.3.29	2026-05-14	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-10-moa
+Mall of America	4.3.28	2026-05-14	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-10-moa
+Mall of America	4.3.27	2026-05-13	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Mall of America	4.3.26	2026-05-12	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Mall of America	4.3.25	2026-05-12	pre	bitrise	Slack build — workflow:deployFromSlack branch:development
 Mall of America	4.3.24	2026-05-12	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Mall of America	4.3.23	2026-05-11	stage	bitrise	Slack build — workflow:deployFromSlack branch:moa-push-notification-debug
@@ -40,6 +60,9 @@ Mall of America	4.2.353	2026-03-26	prod	not released yet	app-3477 regression pro
 Mall of America	4.2.351	2026-03-24	stage		app-3436 regression stage resolved
 Mall of America	4.2.326	2025-12-01	prod	released	app-3238 hotfix icons map
 Mall of America	4.2.317	2025-11-05	prod		
+Marques Avenue	2.10.11	2026-06-03	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-11-nwe-marques
+Marques Avenue	2.10.10	2026-05-29	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Marques Avenue	2.10.9	2026-05-18	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Marques Avenue	2.10.8	2026-05-08	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Marques Avenue	2.10.7	2026-05-08	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Marques Avenue	2.10.6	2026-04-28	stage	internal review	app-3500 regression stage resolved
@@ -48,6 +71,7 @@ Marques Avenue	2.9.714	2025-11-04	stage	flutter team
 Marques Avenue	2.9.707	2025-10-30	stage	flutter team	
 Marques Avenue	2.9.706	2025-10-23	stage	flutter team	
 Marques Avenue	2.9.704	2025-10-13	stage		
+New West End (NWE)	8.28.54	2026-06-03	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-11-nwe-marques
 New West End (NWE)	2.9.745	2026-04-11	stage		
 New West End (NWE)	2.9.740	2026-04-09	prod	released	app-3491 prod RC resolved
 New West End (NWE)	2.9.724	2026-01-23	stage	external review	offer expiry; formatting; home removal; splash; see feedback tracker
@@ -65,6 +89,9 @@ VIA BSFO	1.12.47	2025-12-17	stage	flutter team
 VIA BSFO	1.12.44	2025-11-24	prod	released	app-3182 updated build done
 VIA BSFO	1.13.1 (Android)	2025-11-12	pre	internal review	google wallet pass testing
 VIA BSFO	1.12.42	2025-10-15	stage		
+Village Market	2.9.710	2026-06-03	prod	bitrise	Slack build — workflow:deployFromSlack branch:development
+Village Market	2.9.709	2026-05-25	stage	bitrise	Slack build — workflow:deployFromSlack branch:APP-3589-remove-obsolete-villagemarketconiq
+Village Market	2.9.708	2026-05-25	prod	bitrise	Slack build — workflow:deployFromSlack branch:development
 Village Market	2.9.707	2026-04-14	prod		app-3466 smoke prod resolved
 Village Market	2.9.706	2025-11-28	prod	released	
 Village Market	2.9.703	2025-10-22	stage	flutter team	
@@ -79,6 +106,10 @@ Village Market Coniq	5.9.586	2025-10-14	stage
 Village Market Coniq	5.9.585	2025-10-10	stage		
 Villaggio	0.8.37	2026-06-06	stage		
 Villaggio	0.8.33	2026-06-05	prod	released	
+Villaggio	0.8.45	2026-05-25	stage	bitrise	Slack build — workflow:deployFromSlack branch:APP-3589-remove-obsolete-villagemarketconiq
+Villaggio	0.8.44	2026-05-25	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Villaggio	0.8.43	2026-05-14	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Villaggio	0.8.42	2026-05-14	pre	bitrise	Slack build — workflow:deployFromSlack branch:development
 Villaggio	0.8.40	2026-05-11	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Villaggio	0.8.39	2026-05-11	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Villaggio	0.8.38	2026-05-11	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
@@ -87,5 +118,11 @@ Villaggio	0.8.35	2026-04-15	prod	ios only
 Villaggio	0.8.34	2026-02-19	stage		
 WAFI City / Rewards	2.9.691	2025-10-21	stage	flutter team	
 WAFI City / Rewards	2.9.690	2025-10-16	stage		app-2931 ionic→flutter todo
+Wolfsburg	2.9.811	2026-06-03	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Wolfsburg	2.9.810	2026-05-27	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Wolfsburg	2.9.809	2026-05-19	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Wolfsburg	2.9.808	2026-05-19	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Wolfsburg	2.9.807	2026-05-19	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Wolfsburg	2.9.806	2026-05-12	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Wolfsburg	2.9.805	2026-03-24	stage		app-3453 regression in progress
 Wolfsburg	2.9.718	2025-11-18	stage		
