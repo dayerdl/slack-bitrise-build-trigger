@@ -84,11 +84,11 @@ function tryParseQuickDeploy(normalized) {
   }
 
   const parts = splitArgsRespectingQuotes(normalized);
-  if (parts.length !== 2 && parts.length !== 3) {
+  if (parts.length < 2 || parts.length > 4) {
     return null;
   }
 
-  const [slugRaw, envRaw, messageRaw] = parts;
+  const [slugRaw, envRaw, ...rest] = parts;
   const envLower = envRaw.toLowerCase();
   if (!isValidBuildEnv(envLower)) {
     return null;
@@ -99,11 +99,28 @@ function tryParseQuickDeploy(normalized) {
     return null;
   }
 
+  let buildDebug = false;
+  const messageParts = [];
+  for (const item of rest) {
+    const normalizedItem = String(item ?? "").trim();
+    const normalizedLower = normalizedItem.toLowerCase();
+    if (normalizedLower === "--debug" || normalizedLower === "debug") {
+      buildDebug = true;
+      continue;
+    }
+    messageParts.push(normalizedItem);
+  }
+
+  if (messageParts.length > 1) {
+    return null;
+  }
+
   return {
     type: "quick_deploy",
     platformSlug: slugRaw.trim().toLowerCase(),
     buildEnv: envLower,
-    commitMessage: messageRaw ? String(messageRaw).trim() : null,
+    commitMessage: messageParts[0] ? String(messageParts[0]).trim() : null,
+    buildDebug,
   };
 }
 

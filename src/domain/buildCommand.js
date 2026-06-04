@@ -84,8 +84,8 @@ export function buildSlackUsage(options = {}) {
     "• Optional: `ENV[api_region]:r02` — points the API suffix to `.r02` (for example `sandboxsprings`).",
     "",
     "⚡ *Quick deploy* (highest semver across all env rows for that client → bump patch → confirm in Slack)",
-    "• `/flutter-build <client> <env>` — optional commit text in `\"` or `'`",
-    "• Example: `/flutter-build moa stage` — optional message: `/flutter-build moa stage \"testing push notifications\"`",
+    "• `/flutter-build <client> <env>` — optional commit text in `\"` or `'`; add `--debug` for a debug build.",
+    "• Example: `/flutter-build moa stage` — optional message/debug: `/flutter-build moa stage \"testing push notifications\" --debug`",
     "",
     "🔗 *Release table:* https://github.com/dayerdl/slack-bitrise-build-trigger/blob/main/data/client-releases.tsv",
     ""

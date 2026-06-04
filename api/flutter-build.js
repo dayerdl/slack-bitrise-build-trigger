@@ -173,6 +173,7 @@ export async function POST(request) {
         build_version: plan.nextVersion,
         previous_version: plan.previousVersion,
         build_message: intent.commitMessage || "",
+        build_debug: intent.buildDebug ? "true" : "false",
       };
       const confirmToken = signQuickDeployToken(tokenPayload, signingSecret);
 
@@ -186,6 +187,7 @@ export async function POST(request) {
           branch,
           confirmToken,
           commitMessage: intent.commitMessage,
+          buildDebug: intent.buildDebug,
         })
       );
     }

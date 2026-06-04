@@ -17,10 +17,12 @@ export function buildQuickDeployConfirmationPayload({
   branch,
   confirmToken,
   commitMessage,
+  buildDebug = false,
 }) {
   const messageLine = String(commitMessage ?? "").trim()
     ? `\nMessage: _${escapeMrkdwn(String(commitMessage).trim())}_`
     : "";
+  const debugLine = buildDebug ? "\nBuild mode: *debug*" : "";
   return {
     response_type: "ephemeral",
     replace_original: false,
@@ -34,6 +36,7 @@ export function buildQuickDeployConfirmationPayload({
             `*Quick deploy* · ${escapeMrkdwn(platformSlug)} · *${escapeMrkdwn(buildEnv)}*\n` +
             `Latest in release table: \`${escapeMrkdwn(previousVersion)}\` → *${escapeMrkdwn(nextVersion)}*\n` +
             `Branch: \`${escapeMrkdwn(branch)}\` · workflow: \`deployFromSlack\`` +
+            debugLine +
             messageLine,
         },
       },
