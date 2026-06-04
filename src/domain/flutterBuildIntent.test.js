@@ -57,6 +57,7 @@ test("quick deploy intent two words", () => {
     buildEnv: "stage",
     commitMessage: null,
     buildDebug: false,
+    branch: null,
   });
 });
 
@@ -67,6 +68,7 @@ test("quick deploy accepts optional quoted message (double quotes)", () => {
     buildEnv: "stage",
     commitMessage: "this is for testing PN",
     buildDebug: false,
+    branch: null,
   });
 });
 
@@ -77,6 +79,7 @@ test("quick deploy accepts optional quoted message (single quotes)", () => {
     buildEnv: "stage",
     commitMessage: "hello world",
     buildDebug: false,
+    branch: null,
   });
 });
 
@@ -87,6 +90,7 @@ test("quick deploy accepts debug flag", () => {
     buildEnv: "stage",
     commitMessage: null,
     buildDebug: true,
+    branch: null,
   });
 });
 
@@ -97,6 +101,7 @@ test("quick deploy accepts quoted message and debug flag in either order", () =>
     buildEnv: "stage",
     commitMessage: "testing PN",
     buildDebug: true,
+    branch: null,
   });
   assert.deepEqual(parseFlutterBuildIntent('moa stage --debug "testing PN"'), {
     type: "quick_deploy",
@@ -104,6 +109,37 @@ test("quick deploy accepts quoted message and debug flag in either order", () =>
     buildEnv: "stage",
     commitMessage: "testing PN",
     buildDebug: true,
+    branch: null,
+  });
+});
+
+test("quick deploy accepts optional branch parameter", () => {
+  assert.deepEqual(parseFlutterBuildIntent("moa stage branch:feature/my-branch"), {
+    type: "quick_deploy",
+    platformSlug: "moa",
+    buildEnv: "stage",
+    commitMessage: null,
+    buildDebug: false,
+    branch: "feature/my-branch",
+  });
+});
+
+test("quick deploy accepts branch with message and debug flag", () => {
+  assert.deepEqual(parseFlutterBuildIntent('moa stage "testing PN" --debug --branch feature/my-branch'), {
+    type: "quick_deploy",
+    platformSlug: "moa",
+    buildEnv: "stage",
+    commitMessage: "testing PN",
+    buildDebug: true,
+    branch: "feature/my-branch",
+  });
+  assert.deepEqual(parseFlutterBuildIntent('moa stage --branch=feature/my-branch --debug "testing PN"'), {
+    type: "quick_deploy",
+    platformSlug: "moa",
+    buildEnv: "stage",
+    commitMessage: "testing PN",
+    buildDebug: true,
+    branch: "feature/my-branch",
   });
 });
 

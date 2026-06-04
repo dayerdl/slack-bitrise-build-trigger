@@ -84,7 +84,7 @@ function tryParseQuickDeploy(normalized) {
   }
 
   const parts = splitArgsRespectingQuotes(normalized);
-  if (parts.length < 2 || parts.length > 4) {
+  if (parts.length < 2) {
     return null;
   }
 
@@ -100,12 +100,39 @@ function tryParseQuickDeploy(normalized) {
   }
 
   let buildDebug = false;
+  let branch = null;
   const messageParts = [];
-  for (const item of rest) {
+  for (let i = 0; i < rest.length; i++) {
+    const item = rest[i];
     const normalizedItem = String(item ?? "").trim();
     const normalizedLower = normalizedItem.toLowerCase();
     if (normalizedLower === "--debug" || normalizedLower === "debug") {
       buildDebug = true;
+      continue;
+    }
+    if (normalizedLower === "--branch") {
+      const next = String(rest[i + 1] ?? "").trim();
+      if (!next) {
+        return null;
+      }
+      branch = next;
+      i++;
+      continue;
+    }
+    if (normalizedLower.startsWith("--branch=")) {
+      const value = normalizedItem.slice("--branch=".length).trim();
+      if (!value) {
+        return null;
+      }
+      branch = value;
+      continue;
+    }
+    if (normalizedLower.startsWith("branch:")) {
+      const value = normalizedItem.slice("branch:".length).trim();
+      if (!value) {
+        return null;
+      }
+      branch = value;
       continue;
     }
     messageParts.push(normalizedItem);
@@ -121,6 +148,7 @@ function tryParseQuickDeploy(normalized) {
     buildEnv: envLower,
     commitMessage: messageParts[0] ? String(messageParts[0]).trim() : null,
     buildDebug,
+    branch,
   };
 }
 

@@ -162,7 +162,8 @@ export async function POST(request) {
         throw error;
       }
 
-      const branch = String(process.env.DEFAULT_SLACK_DEPLOY_BRANCH ?? "").trim() || "development";
+      const defaultBranch = String(process.env.DEFAULT_SLACK_DEPLOY_BRANCH ?? "").trim() || "development";
+      const branch = String(intent.branch ?? "").trim() || defaultBranch;
 
       const tokenPayload = {
         t: Date.now(),
