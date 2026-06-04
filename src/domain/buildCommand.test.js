@@ -33,6 +33,24 @@ test("defaults build_ios to true when omitted", () => {
   assert.equal(command.env.build_ios, "true");
 });
 
+test("accepts android_output_type appbundle", () => {
+  const command = parseBuildCommand(
+    "workflow:deploy | branch:master | ENV[build_env]:qa | ENV[platform_account]:moa | ENV[android_output_type]:appbundle"
+  );
+
+  assert.equal(command.env.android_output_type, "appbundle");
+});
+
+test("rejects invalid android_output_type", () => {
+  assert.throws(
+    () =>
+      parseBuildCommand(
+        "workflow:deploy | branch:master | ENV[build_env]:qa | ENV[platform_account]:moa | ENV[android_output_type]:zip"
+      ),
+    BuildCommandValidationError
+  );
+});
+
 test("rejects invalid build environments", () => {
   assert.throws(
     () => parseBuildCommand("workflow:deploy | branch:master | ENV[build_env]:dev | ENV[platform_account]:moa"),

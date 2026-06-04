@@ -20,8 +20,12 @@ test("buildBitriseRequestBody sets commit_message and omits build_message from e
   });
   assert.ok(body.build_params.commit_message.includes("slack_flutter_build|"));
   assert.ok(body.build_params.commit_message.endsWith("— RC for Liwa smoke test"));
-  const keys = body.build_params.environments.map((e) => e.mapped_to);
+  const env = Object.fromEntries(
+    body.build_params.environments.map((item) => [item.mapped_to, item.value])
+  );
+  const keys = Object.keys(env);
   assert.ok(!keys.includes("build_message"));
+  assert.equal(env.slack_build_message, "RC for Liwa smoke test");
 });
 
 test("buildBitriseRequestBody commit_message defaults when build_message unset", () => {

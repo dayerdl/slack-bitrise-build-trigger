@@ -52,9 +52,13 @@ export async function triggerBitriseBuild({ appSlug, apiToken, command, abortSig
  */
 export function buildBitriseEnvironmentsForApi(command) {
   const env = { ...command.env };
+  const buildMessage = String(env.build_message ?? "").trim();
 
   // `ENV[build_message]` is used to build Bitrise `commit_message`, but it is not a build env var.
   if (Object.prototype.hasOwnProperty.call(env, "build_message")) {
+    if (buildMessage && !env.slack_build_message) {
+      env.slack_build_message = buildMessage;
+    }
     delete env.build_message;
   }
 
