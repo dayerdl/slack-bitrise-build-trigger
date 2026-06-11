@@ -4,6 +4,7 @@ batavia
 bergen
 helsinki
 ldo
+macerich
 marques
 moa
 nwe
