@@ -51,6 +51,15 @@ export function computeNextPatchFromReleases(rows, platformSlug, buildEnv, catal
   const matched = filterRowsByClientQuery(rows, platformSlug, catalog);
 
   if (matched.length === 0) {
+    const tsvClientName = resolveKnownTsvClientName(platformSlug, catalog);
+    if (tsvClientName) {
+      return {
+        tsvClientName,
+        previousVersion: "0.0.0",
+        nextVersion: "0.0.1",
+      };
+    }
+
     throw new QuickDeployError(
       `No releases found for "${platformSlug}". Add a row first or use the full /flutter-build command.`
     );
@@ -83,4 +92,18 @@ export function computeNextPatchFromReleases(rows, platformSlug, buildEnv, catal
     previousVersion,
     nextVersion,
   };
+}
+
+function resolveKnownTsvClientName(platformSlug, catalog) {
+  const slugLower = String(platformSlug ?? "").trim().toLowerCase();
+  if (!slugLower || !catalog?.slugs?.length || !catalog.slugToTsv) {
+    return null;
+  }
+
+  const slugExact = catalog.slugs.find((s) => s.toLowerCase() === slugLower);
+  if (slugExact === undefined) {
+    return null;
+  }
+
+  return catalog.slugToTsv[slugExact] ?? null;
 }

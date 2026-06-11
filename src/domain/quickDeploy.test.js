@@ -38,3 +38,22 @@ test("computeNextPatchFromReleases uses prod row when deploying stage if prod ha
   assert.equal(r.previousVersion, "1.0.0");
   assert.equal(r.nextVersion, "1.0.1");
 });
+
+test("computeNextPatchFromReleases starts known clients without release rows at 0.0.1", () => {
+  const macerichCatalog = {
+    slugs: ["macerich"],
+    slugToTsv: { macerich: "Macerich" },
+  };
+
+  const r = computeNextPatchFromReleases([], "macerich", "stage", macerichCatalog);
+  assert.equal(r.tsvClientName, "Macerich");
+  assert.equal(r.previousVersion, "0.0.0");
+  assert.equal(r.nextVersion, "0.0.1");
+});
+
+test("computeNextPatchFromReleases rejects unknown clients without release rows", () => {
+  assert.throws(
+    () => computeNextPatchFromReleases([], "unknown", "stage", catalog),
+    QuickDeployError
+  );
+});
