@@ -87,6 +87,7 @@ Marques Avenue	2.9.714	2025-11-04	stage	flutter team
 Marques Avenue	2.9.707	2025-10-30	stage	flutter team	
 Marques Avenue	2.9.706	2025-10-23	stage	flutter team	
 Marques Avenue	2.9.704	2025-10-13	stage		
+New West End (NWE)	8.28.66	2026-06-16	stage	bitrise	Slack build — workflow:deployFromSlack branch:deeplinks-nwe-debug
 New West End (NWE)	8.28.64	2026-06-11	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-11-nwe-marques
 New West End (NWE)	8.28.63	2026-06-09	stage	bitrise	Slack build — workflow:deployFromSlack branch:APP-3566-fallback-when-offer-is-not-present
 New West End (NWE)	8.28.62	2026-06-09	stage	bitrise	Slack build — workflow:deployFromSlack branch:APP-3566-fallback-when-offer-is-not-present
