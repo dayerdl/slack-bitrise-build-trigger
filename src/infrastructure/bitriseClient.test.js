@@ -88,6 +88,22 @@ test("buildBitriseEnvironmentsForApi mirrors android_output_type to ANDROID_OUTP
   assert.equal(env.ANDROID_OUTPUT_TYPE, "appbundle");
 });
 
+test("buildBitriseEnvironmentsForApi enables dual Android artifacts for prod", () => {
+  const env = buildBitriseEnvironmentsForApi({
+    workflow: "deploy",
+    branch: "master",
+    env: {
+      build_env: "prod",
+      platform_account: "moa",
+      build_android: "true",
+      android_output_type: "aab",
+    },
+  });
+  assert.equal(env.ANDROID_BUILD_BOTH, "true");
+  assert.equal(env.android_output_type, "apk");
+  assert.equal(env.ANDROID_OUTPUT_TYPE, "apk");
+});
+
 test("buildBitriseEnvironmentsForApi splits 0.0.12 into app_version_*", () => {
   const env = buildBitriseEnvironmentsForApi({
     workflow: "deploy",

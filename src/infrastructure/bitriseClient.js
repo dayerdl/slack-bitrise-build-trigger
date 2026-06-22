@@ -89,6 +89,14 @@ export function buildBitriseEnvironmentsForApi(command) {
     env.ANDROID_OUTPUT_TYPE = env.android_output_type;
   }
 
+  const buildEnv = String(env.build_env ?? "").trim().toLowerCase();
+  const buildAndroidEnabled = String(env.build_android ?? "true").trim().toLowerCase() !== "false";
+  if (buildEnv === "prod" && buildAndroidEnabled) {
+    env.ANDROID_BUILD_BOTH = "true";
+    env.android_output_type = "apk";
+    env.ANDROID_OUTPUT_TYPE = "apk";
+  }
+
   // Derive `app_version_*` from `build_version` when not already set.
   const buildVersion = String(env.build_version ?? "").trim();
   if (buildVersion && !env.app_version_major && !env.app_version_minor && !env.app_version_patch) {
