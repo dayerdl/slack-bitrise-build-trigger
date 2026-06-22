@@ -95,6 +95,7 @@ export function buildBitriseEnvironmentsForApi(command) {
     env.ANDROID_BUILD_BOTH = "true";
     env.android_output_type = "apk";
     env.ANDROID_OUTPUT_TYPE = "apk";
+    env.android_output_type_display = "apk+aab";
   }
 
   // Derive `app_version_*` from `build_version` when not already set.

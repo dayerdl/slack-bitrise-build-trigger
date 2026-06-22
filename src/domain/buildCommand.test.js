@@ -4,7 +4,9 @@ import test from "node:test";
 import {
   BuildCommandValidationError,
   buildSlackUsage,
+  formatAndroidOutputTypeLabel,
   formatBitriseTriggerMessage,
+  formatCommandSummary,
   normalizeAndroidOutputType,
   parseBuildCommand,
 } from "./buildCommand.js";
@@ -53,6 +55,41 @@ test("accepts android_output_type aab alias", () => {
 test("normalizeAndroidOutputType maps aab to appbundle", () => {
   assert.equal(normalizeAndroidOutputType("aab"), "appbundle");
   assert.equal(normalizeAndroidOutputType("apk"), "apk");
+});
+
+test("formatAndroidOutputTypeLabel shows apk+aab for prod android builds", () => {
+  assert.equal(
+    formatAndroidOutputTypeLabel({
+      build_env: "prod",
+      build_android: "true",
+      android_output_type: "apk",
+    }),
+    "apk+aab"
+  );
+  assert.equal(
+    formatAndroidOutputTypeLabel({
+      build_env: "stage",
+      build_android: "true",
+      android_output_type: "aab",
+    }),
+    "appbundle"
+  );
+});
+
+test("formatCommandSummary shows apk+aab for prod android builds", () => {
+  const summary = formatCommandSummary({
+    workflow: "deployFromSlack",
+    branch: "development",
+    env: {
+      build_env: "prod",
+      platform_account: "moa",
+      build_ios: "true",
+      build_android: "true",
+      android_output_type: "apk",
+      build_version: "4.3.368",
+    },
+  });
+  assert.ok(summary.includes("android_output_type=apk+aab"));
 });
 
 test("rejects invalid android_output_type", () => {

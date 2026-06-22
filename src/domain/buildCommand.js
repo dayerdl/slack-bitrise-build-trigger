@@ -109,8 +109,21 @@ export function buildSlackUsage(options = {}) {
   return body.join("\n") + formatClientHelpAppendix();
 }
 
+export function formatAndroidOutputTypeLabel(env) {
+  const buildEnv = String(env?.build_env ?? "").trim().toLowerCase();
+  const buildAndroidEnabled =
+    String(env?.build_android ?? "true").trim().toLowerCase() !== "false";
+  if (buildEnv === "prod" && buildAndroidEnabled) {
+    return "apk+aab";
+  }
+  return normalizeAndroidOutputType(env?.android_output_type ?? "apk");
+}
+
 export function formatCommandSummary(command) {
-  const envSummary = Object.entries(command.env)
+  const displayEnv = { ...command.env };
+  displayEnv.android_output_type = formatAndroidOutputTypeLabel(command.env);
+
+  const envSummary = Object.entries(displayEnv)
     .map(([key, value]) => `${key}=${value}`)
     .join(", ");
 
