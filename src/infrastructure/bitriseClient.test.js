@@ -74,6 +74,20 @@ test("buildBitriseEnvironmentsForApi mirrors build_ios and build_android to BUIL
   assert.equal(env.BUILD_ANDROID, "true");
 });
 
+test("buildBitriseEnvironmentsForApi mirrors android_output_type to ANDROID_OUTPUT_TYPE", () => {
+  const env = buildBitriseEnvironmentsForApi({
+    workflow: "deploy",
+    branch: "master",
+    env: {
+      build_env: "stage",
+      platform_account: "moa",
+      android_output_type: "aab",
+    },
+  });
+  assert.equal(env.android_output_type, "appbundle");
+  assert.equal(env.ANDROID_OUTPUT_TYPE, "appbundle");
+});
+
 test("buildBitriseEnvironmentsForApi splits 0.0.12 into app_version_*", () => {
   const env = buildBitriseEnvironmentsForApi({
     workflow: "deploy",

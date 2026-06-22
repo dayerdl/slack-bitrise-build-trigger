@@ -1,4 +1,4 @@
-import { formatBitriseTriggerMessage } from "../domain/buildCommand.js";
+import { formatBitriseTriggerMessage, normalizeAndroidOutputType } from "../domain/buildCommand.js";
 
 const BITRISE_API_BASE_URL = "https://api.bitrise.io/v0.1";
 
@@ -82,6 +82,11 @@ export function buildBitriseEnvironmentsForApi(command) {
   }
   if (env.build_android) {
     env.BUILD_ANDROID = env.build_android;
+  }
+
+  if (env.android_output_type) {
+    env.android_output_type = normalizeAndroidOutputType(env.android_output_type);
+    env.ANDROID_OUTPUT_TYPE = env.android_output_type;
   }
 
   // Derive `app_version_*` from `build_version` when not already set.

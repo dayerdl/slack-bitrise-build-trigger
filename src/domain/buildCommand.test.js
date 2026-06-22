@@ -5,6 +5,7 @@ import {
   BuildCommandValidationError,
   buildSlackUsage,
   formatBitriseTriggerMessage,
+  normalizeAndroidOutputType,
   parseBuildCommand,
 } from "./buildCommand.js";
 
@@ -39,6 +40,19 @@ test("accepts android_output_type appbundle", () => {
   );
 
   assert.equal(command.env.android_output_type, "appbundle");
+});
+
+test("accepts android_output_type aab alias", () => {
+  const command = parseBuildCommand(
+    "workflow:deploy | branch:master | ENV[build_env]:qa | ENV[platform_account]:moa | ENV[android_output_type]:aab"
+  );
+
+  assert.equal(command.env.android_output_type, "appbundle");
+});
+
+test("normalizeAndroidOutputType maps aab to appbundle", () => {
+  assert.equal(normalizeAndroidOutputType("aab"), "appbundle");
+  assert.equal(normalizeAndroidOutputType("apk"), "apk");
 });
 
 test("rejects invalid android_output_type", () => {

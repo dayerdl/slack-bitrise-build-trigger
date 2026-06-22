@@ -4,6 +4,17 @@ const VALID_BUILD_ENVS = new Set(["qa", "pre", "stage", "prod"]);
 const BOOLEAN_ENV_KEYS = new Set(["build_ios", "build_android", "build_debug"]);
 const VALID_ANDROID_OUTPUT_TYPES = new Set(["apk", "appbundle"]);
 
+export function normalizeAndroidOutputType(value) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (!normalized) {
+    return "apk";
+  }
+  if (normalized === "aab") {
+    return "appbundle";
+  }
+  return normalized;
+}
+
 export function isValidBuildEnv(value) {
   return VALID_BUILD_ENVS.has(String(value ?? "").trim().toLowerCase());
 }
@@ -48,7 +59,7 @@ export function parseBuildCommand(input, options = {}) {
   }
 
   if (env.android_output_type) {
-    env.android_output_type = env.android_output_type.toLowerCase();
+    env.android_output_type = normalizeAndroidOutputType(env.android_output_type);
   }
 
   validateCommand(fields, env, options);
@@ -80,7 +91,7 @@ export function buildSlackUsage(options = {}) {
     "🚀 *Full Bitrise trigger* (pipe-separated)",
     "• `/flutter-build workflow:deploy | branch:master | ENV[build_env]:prod | ENV[platform_account]:tanger | ENV[build_ios]:true | ENV[build_android]:false | ENV[build_version]:8.0.18`",
     "• Optional: `ENV[build_debug]:true` — builds a debug APK/IPA instead of release.",
-    "• Optional: `ENV[android_output_type]:appbundle` — builds an Android App Bundle instead of an APK.",
+    "• Optional: `ENV[android_output_type]:appbundle` (or `aab`) — builds an Android App Bundle instead of an APK.",
     "• Optional: `ENV[api_region]:r02` — points the API suffix to `.r02` (for example `sandboxsprings`).",
     "",
     "⚡ *Quick deploy* (highest semver across all env rows for that client → bump patch → confirm in Slack)",
