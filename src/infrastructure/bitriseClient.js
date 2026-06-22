@@ -77,6 +77,13 @@ export function buildBitriseEnvironmentsForApi(command) {
     env.build_customer = account;
   }
 
+  if (env.build_ios) {
+    env.BUILD_IOS = env.build_ios;
+  }
+  if (env.build_android) {
+    env.BUILD_ANDROID = env.build_android;
+  }
+
   // Derive `app_version_*` from `build_version` when not already set.
   const buildVersion = String(env.build_version ?? "").trim();
   if (buildVersion && !env.app_version_major && !env.app_version_minor && !env.app_version_patch) {

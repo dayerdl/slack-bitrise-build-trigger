@@ -57,6 +57,23 @@ test("buildBitriseEnvironmentsForApi mirrors platform_account to build_customer"
   assert.equal(env.build_customer, "tanger");
 });
 
+test("buildBitriseEnvironmentsForApi mirrors build_ios and build_android to BUILD_*", () => {
+  const env = buildBitriseEnvironmentsForApi({
+    workflow: "deploy",
+    branch: "master",
+    env: {
+      build_env: "stage",
+      platform_account: "moa",
+      build_ios: "false",
+      build_android: "true",
+    },
+  });
+  assert.equal(env.build_ios, "false");
+  assert.equal(env.build_android, "true");
+  assert.equal(env.BUILD_IOS, "false");
+  assert.equal(env.BUILD_ANDROID, "true");
+});
+
 test("buildBitriseEnvironmentsForApi splits 0.0.12 into app_version_*", () => {
   const env = buildBitriseEnvironmentsForApi({
     workflow: "deploy",
