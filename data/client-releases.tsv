@@ -161,6 +161,7 @@ Villaggio	0.8.35	2026-04-15	prod	ios only
 Villaggio	0.8.34	2026-02-19	stage		
 WAFI City / Rewards	2.9.691	2025-10-21	stage	flutter team	
 WAFI City / Rewards	2.9.690	2025-10-16	stage		app-2931 ionic→flutter todo
+Wolfsburg	2.9.812	2026-06-22	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Wolfsburg	2.9.811	2026-06-03	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Wolfsburg	2.9.810	2026-05-27	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Wolfsburg	2.9.809	2026-05-19	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
