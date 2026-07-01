@@ -104,6 +104,21 @@ test("buildBitriseEnvironmentsForApi enables dual Android artifacts for prod", (
   assert.equal(env.ANDROID_OUTPUT_TYPE, "apk");
 });
 
+test("buildBitriseEnvironmentsForApi skips dual Android artifacts for web builds", () => {
+  const env = buildBitriseEnvironmentsForApi({
+    workflow: "deployWebapp",
+    branch: "development",
+    env: {
+      build_env: "prod",
+      platform_account: "macerich",
+      build_platform: "web",
+      build_android: "false",
+      build_ios: "false",
+    },
+  });
+  assert.equal(env.ANDROID_BUILD_BOTH, undefined);
+});
+
 test("buildBitriseEnvironmentsForApi splits 0.0.12 into app_version_*", () => {
   const env = buildBitriseEnvironmentsForApi({
     workflow: "deploy",

@@ -1,4 +1,5 @@
 import { formatBitriseTriggerMessage, normalizeAndroidOutputType } from "../domain/buildCommand.js";
+import { isWebBuildPlatform } from "../domain/clientWebHosting.js";
 
 const BITRISE_API_BASE_URL = "https://api.bitrise.io/v0.1";
 
@@ -91,7 +92,8 @@ export function buildBitriseEnvironmentsForApi(command) {
 
   const buildEnv = String(env.build_env ?? "").trim().toLowerCase();
   const buildAndroidEnabled = String(env.build_android ?? "true").trim().toLowerCase() !== "false";
-  if (buildEnv === "prod" && buildAndroidEnabled) {
+  const isWebBuild = isWebBuildPlatform(env.build_platform);
+  if (buildEnv === "prod" && buildAndroidEnabled && !isWebBuild) {
     env.ANDROID_BUILD_BOTH = "true";
     env.android_output_type = "apk";
     env.ANDROID_OUTPUT_TYPE = "apk";

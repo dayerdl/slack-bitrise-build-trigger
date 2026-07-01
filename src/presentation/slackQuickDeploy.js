@@ -18,11 +18,22 @@ export function buildQuickDeployConfirmationPayload({
   confirmToken,
   commitMessage,
   buildDebug = false,
+  buildPlatform = null,
+  webHostingUrl = null,
+  awsBucketName = null,
 }) {
   const messageLine = String(commitMessage ?? "").trim()
     ? `\nMessage: _${escapeMrkdwn(String(commitMessage).trim())}_`
     : "";
-  const debugLine = buildDebug ? "\nBuild mode: *debug*" : "";
+  const isWeb = String(buildPlatform ?? "").trim().toLowerCase() === "web";
+  const debugLine = buildDebug && !isWeb ? "\nBuild mode: *debug*" : "";
+  const workflow = isWeb ? "deployWebapp" : "deployFromSlack";
+  const webLine =
+    isWeb && webHostingUrl && awsBucketName
+      ? `\nWeb: \`${escapeMrkdwn(webHostingUrl)}\` → S3 \`${escapeMrkdwn(awsBucketName)}\``
+      : isWeb
+        ? "\nPlatform: *web*"
+        : "";
   return {
     response_type: "ephemeral",
     replace_original: false,
@@ -35,7 +46,8 @@ export function buildQuickDeployConfirmationPayload({
           text:
             `*Quick deploy* · ${escapeMrkdwn(platformSlug)} · *${escapeMrkdwn(buildEnv)}*\n` +
             `Latest in release table: \`${escapeMrkdwn(previousVersion)}\` → *${escapeMrkdwn(nextVersion)}*\n` +
-            `Branch: \`${escapeMrkdwn(branch)}\` · workflow: \`deployFromSlack\`` +
+            `Branch: \`${escapeMrkdwn(branch)}\` · workflow: \`${workflow}\`` +
+            webLine +
             debugLine +
             messageLine,
         },

@@ -1,4 +1,9 @@
 import { formatClientHelpAppendix } from "./coniqClients.js";
+import {
+  isWebBuildPlatform,
+  resolveWebHostingConfig,
+  WebHostingConfigError,
+} from "./clientWebHosting.js";
 
 const VALID_BUILD_ENVS = new Set(["qa", "pre", "stage", "prod"]);
 const BOOLEAN_ENV_KEYS = new Set(["build_ios", "build_android", "build_debug"]);
@@ -62,7 +67,20 @@ export function parseBuildCommand(input, options = {}) {
     env.android_output_type = normalizeAndroidOutputType(env.android_output_type);
   }
 
+  if (fields.platform) {
+    env.build_platform = String(fields.platform).trim().toLowerCase();
+  }
+
+  if (isWebBuildPlatform(env.build_platform)) {
+    if (!fields.workflow) {
+      fields.workflow = "deployWebapp";
+    }
+    env.build_ios = "false";
+    env.build_android = "false";
+  }
+
   validateCommand(fields, env, options);
+  applyWebHostingEnv(fields, env);
 
   return {
     workflow: fields.workflow,
@@ -93,9 +111,11 @@ export function buildSlackUsage(options = {}) {
     "• Optional: `ENV[build_debug]:true` — builds a debug APK/IPA instead of release.",
     "• Optional: `ENV[android_output_type]:appbundle` (or `aab`) — builds an Android App Bundle instead of an APK (ignored for `prod`, which generates both APK and AAB).",
     "• Optional: `ENV[api_region]:r02` — points the API suffix to `.r02` (for example `sandboxsprings`).",
+    "• Web: `workflow:deployWebapp | branch:development | ENV[build_env]:stage | ENV[platform_account]:macerich | platform:web | ENV[build_version]:1.0.0`",
     "",
     "⚡ *Quick deploy* (highest semver across all env rows for that client → bump patch → confirm in Slack)",
     "• `/flutter-build <client> <env>` — optional commit text in `\"` or `'`; add `--debug` for a debug build; add `branch:<name>` to override the default branch.",
+    "• Web quick deploy: `/flutter-build macerich stage platform:web` (uses `deployWebapp` + S3 bucket from `data/client_web_hosting.json`).",
     "• Example: `/flutter-build moa stage` — optional message/debug/branch: `/flutter-build moa stage \"testing push notifications\" --debug branch:feature/my-branch`",
     "",
     "🔗 *Release table:* https://github.com/dayerdl/slack-bitrise-build-trigger/blob/main/data/client-releases.tsv",
@@ -205,6 +225,12 @@ function validateCommand(fields, env, options) {
     throw new BuildCommandValidationError("ENV[android_output_type] must be one of: apk, appbundle.");
   }
 
+  if (isWebBuildPlatform(env.build_platform)) {
+    if (fields.workflow && fields.workflow !== "deployWebapp") {
+      throw new BuildCommandValidationError("Web builds require workflow:deployWebapp.");
+    }
+  }
+
   const allowedCustomers = options.allowedCustomers ?? [];
   if (allowedCustomers.length > 0 && !allowedCustomers.some((c) => c.toLowerCase() === env.platform_account.toLowerCase())) {
     throw new BuildCommandValidationError(
@@ -216,5 +242,23 @@ function validateCommand(fields, env, options) {
 function requireValue(value, fieldName) {
   if (!value) {
     throw new BuildCommandValidationError(`Missing required parameter: ${fieldName}.`);
+  }
+}
+
+function applyWebHostingEnv(fields, env) {
+  if (!isWebBuildPlatform(env.build_platform)) {
+    return;
+  }
+
+  try {
+    const hosting = resolveWebHostingConfig(env.platform_account, env.build_env);
+    env.aws_bucket_name = hosting.web_hosting_s3_bucket;
+    env.web_hosting_url = hosting.web_hosting_url;
+    fields.workflow = "deployWebapp";
+  } catch (error) {
+    if (error instanceof WebHostingConfigError) {
+      throw new BuildCommandValidationError(error.message);
+    }
+    throw error;
   }
 }

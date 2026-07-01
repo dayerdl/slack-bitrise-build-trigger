@@ -101,6 +101,7 @@ function tryParseQuickDeploy(normalized) {
 
   let buildDebug = false;
   let branch = null;
+  let buildPlatform = null;
   const messageParts = [];
   for (let i = 0; i < rest.length; i++) {
     const item = rest[i];
@@ -108,6 +109,30 @@ function tryParseQuickDeploy(normalized) {
     const normalizedLower = normalizedItem.toLowerCase();
     if (normalizedLower === "--debug" || normalizedLower === "debug") {
       buildDebug = true;
+      continue;
+    }
+    if (normalizedLower === "platform:web" || normalizedLower === "web") {
+      buildPlatform = "web";
+      continue;
+    }
+    if (normalizedLower === "--platform") {
+      const next = String(rest[i + 1] ?? "").trim().toLowerCase();
+      if (!next) {
+        return null;
+      }
+      if (next !== "web") {
+        return null;
+      }
+      buildPlatform = "web";
+      i++;
+      continue;
+    }
+    if (normalizedLower.startsWith("--platform=")) {
+      const value = normalizedItem.slice("--platform=".length).trim().toLowerCase();
+      if (value !== "web") {
+        return null;
+      }
+      buildPlatform = "web";
       continue;
     }
     if (normalizedLower === "--branch") {
@@ -149,6 +174,7 @@ function tryParseQuickDeploy(normalized) {
     commitMessage: messageParts[0] ? String(messageParts[0]).trim() : null,
     buildDebug,
     branch,
+    buildPlatform,
   };
 }
 

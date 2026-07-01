@@ -1,0 +1,30 @@
+{
+  "balharbour": {
+    "pre": {
+      "web_hosting_url": "pre.webapp.balharbourshops.com",
+      "web_hosting_s3_bucket": "webapp-balharbourshops-pre"
+    },
+    "stage": {
+      "web_hosting_url": "stage.webapp.balharbourshops.com",
+      "web_hosting_s3_bucket": "webapp-balharbourshops-stage"
+    },
+    "prod": {
+      "web_hosting_url": "webapp.balharbourshops.com",
+      "web_hosting_s3_bucket": "webapp-balharbourshops-prod"
+    }
+  },
+  "macerich": {
+    "pre": {
+      "web_hosting_url": "pre.webapp.school-cents.com",
+      "web_hosting_s3_bucket": "webapp-macerich-pre"
+    },
+    "stage": {
+      "web_hosting_url": "stage.webapp.school-cents.com",
+      "web_hosting_s3_bucket": "webapp-macerich-stage"
+    },
+    "prod": {
+      "web_hosting_url": "webapp.school-cents.com",
+      "web_hosting_s3_bucket": "webapp-macerich-prod"
+    }
+  }
+}

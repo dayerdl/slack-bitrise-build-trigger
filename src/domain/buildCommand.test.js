@@ -169,3 +169,26 @@ test("rejects customers outside the configured allow list", () => {
     BuildCommandValidationError
   );
 });
+
+test("parses web deploy command with hosting env vars", () => {
+  const command = parseBuildCommand(
+    "workflow:deployWebapp | branch:development | ENV[build_env]:stage | ENV[platform_account]:macerich | platform:web | ENV[build_version]:1.0.0",
+    { allowedCustomers: ["macerich"] }
+  );
+
+  assert.equal(command.workflow, "deployWebapp");
+  assert.equal(command.env.build_platform, "web");
+  assert.equal(command.env.build_ios, "false");
+  assert.equal(command.env.build_android, "false");
+  assert.equal(command.env.aws_bucket_name, "webapp-macerich-stage");
+  assert.equal(command.env.web_hosting_url, "stage.webapp.school-cents.com");
+});
+
+test("infers deployWebapp workflow when platform:web without explicit workflow", () => {
+  const command = parseBuildCommand(
+    "branch:development | ENV[build_env]:stage | ENV[platform_account]:balharbour | platform:web | ENV[build_version]:4.0.1"
+  );
+
+  assert.equal(command.workflow, "deployWebapp");
+  assert.equal(command.env.aws_bucket_name, "webapp-balharbourshops-stage");
+});

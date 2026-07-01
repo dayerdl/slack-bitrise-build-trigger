@@ -18,6 +18,10 @@ import {
   loadClientReleaseRows,
 } from "../src/domain/clientReleases.js";
 import { parseFlutterBuildIntent } from "../src/domain/flutterBuildIntent.js";
+import {
+  resolveWebHostingConfig,
+  WebHostingConfigError,
+} from "../src/domain/clientWebHosting.js";
 import { QuickDeployError, computeNextPatchFromReleases } from "../src/domain/quickDeploy.js";
 import { signQuickDeployToken } from "../src/infrastructure/quickDeployConfirmToken.js";
 import { verifySlackSignature } from "../src/infrastructure/slackSignature.js";
@@ -164,17 +168,40 @@ export async function POST(request) {
 
       const defaultBranch = String(process.env.DEFAULT_SLACK_DEPLOY_BRANCH ?? "").trim() || "development";
       const branch = String(intent.branch ?? "").trim() || defaultBranch;
+      const isWebBuild = intent.buildPlatform === "web";
+      let webHosting = null;
+
+      if (isWebBuild) {
+        try {
+          webHosting = resolveWebHostingConfig(canonical, intent.buildEnv);
+        } catch (error) {
+          if (error instanceof WebHostingConfigError) {
+            return jsonResponse(200, {
+              response_type: "ephemeral",
+              text: error.message,
+            });
+          }
+          throw error;
+        }
+      }
 
       const tokenPayload = {
         t: Date.now(),
-        workflow: "deployFromSlack",
+        workflow: isWebBuild ? "deployWebapp" : "deployFromSlack",
         branch,
         platform_account: canonical,
         build_env: intent.buildEnv,
         build_version: plan.nextVersion,
         previous_version: plan.previousVersion,
         build_message: intent.commitMessage || "",
-        build_debug: intent.buildDebug ? "true" : "false",
+        build_debug: intent.buildDebug && !isWebBuild ? "true" : "false",
+        ...(isWebBuild
+          ? {
+              build_platform: "web",
+              aws_bucket_name: webHosting.web_hosting_s3_bucket,
+              web_hosting_url: webHosting.web_hosting_url,
+            }
+          : {}),
       };
       const confirmToken = signQuickDeployToken(tokenPayload, signingSecret);
 
@@ -189,6 +216,9 @@ export async function POST(request) {
           confirmToken,
           commitMessage: intent.commitMessage,
           buildDebug: intent.buildDebug,
+          buildPlatform: intent.buildPlatform,
+          webHostingUrl: webHosting?.web_hosting_url,
+          awsBucketName: webHosting?.web_hosting_s3_bucket,
         })
       );
     }

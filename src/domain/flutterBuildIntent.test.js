@@ -58,6 +58,7 @@ test("quick deploy intent two words", () => {
     commitMessage: null,
     buildDebug: false,
     branch: null,
+    buildPlatform: null,
   });
 });
 
@@ -69,6 +70,7 @@ test("quick deploy accepts optional quoted message (double quotes)", () => {
     commitMessage: "this is for testing PN",
     buildDebug: false,
     branch: null,
+    buildPlatform: null,
   });
 });
 
@@ -80,6 +82,7 @@ test("quick deploy accepts optional quoted message (single quotes)", () => {
     commitMessage: "hello world",
     buildDebug: false,
     branch: null,
+    buildPlatform: null,
   });
 });
 
@@ -91,6 +94,7 @@ test("quick deploy accepts debug flag", () => {
     commitMessage: null,
     buildDebug: true,
     branch: null,
+    buildPlatform: null,
   });
 });
 
@@ -102,6 +106,7 @@ test("quick deploy accepts quoted message and debug flag in either order", () =>
     commitMessage: "testing PN",
     buildDebug: true,
     branch: null,
+    buildPlatform: null,
   });
   assert.deepEqual(parseFlutterBuildIntent('moa stage --debug "testing PN"'), {
     type: "quick_deploy",
@@ -110,6 +115,7 @@ test("quick deploy accepts quoted message and debug flag in either order", () =>
     commitMessage: "testing PN",
     buildDebug: true,
     branch: null,
+    buildPlatform: null,
   });
 });
 
@@ -121,6 +127,7 @@ test("quick deploy accepts optional branch parameter", () => {
     commitMessage: null,
     buildDebug: false,
     branch: "feature/my-branch",
+    buildPlatform: null,
   });
 });
 
@@ -132,6 +139,7 @@ test("quick deploy accepts branch with message and debug flag", () => {
     commitMessage: "testing PN",
     buildDebug: true,
     branch: "feature/my-branch",
+    buildPlatform: null,
   });
   assert.deepEqual(parseFlutterBuildIntent('moa stage --branch=feature/my-branch --debug "testing PN"'), {
     type: "quick_deploy",
@@ -140,6 +148,31 @@ test("quick deploy accepts branch with message and debug flag", () => {
     commitMessage: "testing PN",
     buildDebug: true,
     branch: "feature/my-branch",
+    buildPlatform: null,
+  });
+});
+
+test("quick deploy accepts platform:web", () => {
+  assert.deepEqual(parseFlutterBuildIntent("macerich stage platform:web"), {
+    type: "quick_deploy",
+    platformSlug: "macerich",
+    buildEnv: "stage",
+    commitMessage: null,
+    buildDebug: false,
+    branch: null,
+    buildPlatform: "web",
+  });
+});
+
+test("quick deploy accepts --platform web", () => {
+  assert.deepEqual(parseFlutterBuildIntent("balharbour prod --platform web"), {
+    type: "quick_deploy",
+    platformSlug: "balharbour",
+    buildEnv: "prod",
+    commitMessage: null,
+    buildDebug: false,
+    branch: null,
+    buildPlatform: "web",
   });
 });
 
