@@ -105,5 +105,15 @@ function resolveKnownTsvClientName(platformSlug, catalog) {
     return null;
   }
 
-  return catalog.slugToTsv[slugExact] ?? null;
+  const mapped = catalog.slugToTsv[slugExact];
+  if (mapped) {
+    return mapped;
+  }
+
+  // Known folder slug listed in client_slug_to_tsv.json with null (web-only clients, etc.)
+  if (Object.prototype.hasOwnProperty.call(catalog.slugToTsv, slugExact)) {
+    return slugExact;
+  }
+
+  return null;
 }

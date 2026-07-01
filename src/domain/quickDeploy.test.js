@@ -51,6 +51,29 @@ test("computeNextPatchFromReleases starts known clients without release rows at 
   assert.equal(r.nextVersion, "0.0.1");
 });
 
+test("computeNextPatchFromReleases starts balharbour without release rows at 0.0.1", () => {
+  const balharbourCatalog = {
+    slugs: ["balharbour"],
+    slugToTsv: { balharbour: "Bal Harbour" },
+  };
+
+  const r = computeNextPatchFromReleases([], "balharbour", "stage", balharbourCatalog);
+  assert.equal(r.tsvClientName, "Bal Harbour");
+  assert.equal(r.previousVersion, "0.0.0");
+  assert.equal(r.nextVersion, "0.0.1");
+});
+
+test("computeNextPatchFromReleases starts known slug with null tsv mapping at 0.0.1", () => {
+  const catalogWithNull = {
+    slugs: ["balharbour"],
+    slugToTsv: { balharbour: null },
+  };
+
+  const r = computeNextPatchFromReleases([], "balharbour", "stage", catalogWithNull);
+  assert.equal(r.tsvClientName, "balharbour");
+  assert.equal(r.nextVersion, "0.0.1");
+});
+
 test("computeNextPatchFromReleases rejects unknown clients without release rows", () => {
   assert.throws(
     () => computeNextPatchFromReleases([], "unknown", "stage", catalog),
