@@ -165,3 +165,19 @@ test("buildBitriseRequestBody forwards Slack actor to Bitrise env and triggered_
   assert.equal(env.slack_triggered_by_user_name, "david.dayer");
   assert.equal(body.triggered_by, "david.dayer");
 });
+
+test("buildBitriseRequestBody sends tag instead of branch when tag is set", () => {
+  const body = buildBitriseRequestBody({
+    workflow: "deployWebapp",
+    tag: "v4.0.0-stage",
+    env: {
+      build_env: "stage",
+      platform_account: "balharbour",
+      build_version: "4.0.1",
+      build_platform: "web",
+    },
+  });
+
+  assert.equal(body.build_params.tag, "v4.0.0-stage");
+  assert.equal(body.build_params.branch, undefined);
+});

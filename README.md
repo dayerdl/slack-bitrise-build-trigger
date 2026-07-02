@@ -10,6 +10,7 @@ Vercel API for the `/flutter-build` Slack slash command. Validates Slack request
 /flutter-build moa stage
 /flutter-build moa stage "smoke test" --debug
 /flutter-build moa stage branch:feature/my-branch
+/flutter-build moa stage tag:v4.0.0-stage
 ```
 
 **Web quick deploy** — same flow, uses `deployWebapp` + S3 bucket from `data/client_web_hosting.json`:
@@ -42,6 +43,7 @@ Type `/flutter-build help` in Slack for the full in-app reference.
 | Workflow (mobile) | `deployFromSlack` |
 | Workflow (web) | `deployWebapp` |
 | Branch | `DEFAULT_SLACK_DEPLOY_BRANCH` (default `development`) |
+| Tag | Optional; use `tag:<name>` or `--tag <name>` instead of branch (Bitrise clones that tag) |
 | `build_env` | Your second word (`qa`, `pre`, `stage`, `prod`) |
 | Mobile platforms | iOS + Android (`--debug` → Android debug only, no iOS) |
 
@@ -55,9 +57,10 @@ For full control without the confirmation step:
 
 ```text
 /flutter-build workflow:deploy | branch:development | ENV[build_env]:stage | ENV[platform_account]:moa | ENV[build_version]:4.3.26
+/flutter-build workflow:deploy | tag:v4.0.0-stage | ENV[build_env]:stage | ENV[platform_account]:moa | ENV[build_version]:4.3.26
 ```
 
-`deploy` is an alias for `deployFromSlack`.
+Use `branch:` or `tag:` (not both). `deploy` is an alias for `deployFromSlack`.
 
 **Web (full form):**
 

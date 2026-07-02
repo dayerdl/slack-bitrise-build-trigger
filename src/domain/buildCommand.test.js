@@ -20,6 +20,7 @@ test("parses a full Slack build command", () => {
   assert.deepEqual(command, {
     workflow: "deploy",
     branch: "master",
+    tag: null,
     env: {
       build_env: "prod",
       platform_account: "tanger",
@@ -191,4 +192,24 @@ test("infers deployWebapp workflow when platform:web without explicit workflow",
 
   assert.equal(command.workflow, "deployWebapp");
   assert.equal(command.env.aws_bucket_name, "webapp-balharbourshops-stage");
+});
+
+test("parses tag instead of branch in full command", () => {
+  const command = parseBuildCommand(
+    "workflow:deploy | tag:v4.0.0-stage | ENV[build_env]:stage | ENV[platform_account]:moa | ENV[build_version]:4.0.1"
+  );
+
+  assert.equal(command.tag, "v4.0.0-stage");
+  assert.equal(command.branch, null);
+  assert.ok(formatCommandSummary(command).includes("tag=v4.0.0-stage"));
+});
+
+test("rejects branch and tag together", () => {
+  assert.throws(
+    () =>
+      parseBuildCommand(
+        "workflow:deploy | branch:main | tag:v1.0.0 | ENV[build_env]:stage | ENV[platform_account]:moa"
+      ),
+    /branch: or tag:/
+  );
 });

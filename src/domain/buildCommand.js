@@ -84,7 +84,8 @@ export function parseBuildCommand(input, options = {}) {
 
   return {
     workflow: fields.workflow,
-    branch: fields.branch,
+    branch: fields.branch || null,
+    tag: fields.tag || null,
     env,
   };
 }
@@ -114,9 +115,9 @@ export function buildSlackUsage(options = {}) {
     "• Web: `workflow:deployWebapp | branch:development | ENV[build_env]:stage | ENV[platform_account]:macerich | platform:web | ENV[build_version]:1.0.0`",
     "",
     "⚡ *Quick deploy* (highest semver across all env rows for that client → bump patch → confirm in Slack)",
-    "• `/flutter-build <client> <env>` — optional commit text in `\"` or `'`; add `--debug` for a debug build; add `branch:<name>` to override the default branch.",
+    "• `/flutter-build <client> <env>` — optional commit text in `\"` or `'`; add `--debug` for a debug build; add `branch:<name>` or `tag:<name>` to override the default ref.",
     "• Web quick deploy: `/flutter-build macerich stage platform:web` (uses `deployWebapp` + S3 bucket from `data/client_web_hosting.json`).",
-    "• Example: `/flutter-build moa stage` — optional message/debug/branch: `/flutter-build moa stage \"testing push notifications\" --debug branch:feature/my-branch`",
+    "• Example: `/flutter-build moa stage` — optional message/debug/ref: `/flutter-build moa stage \"testing PN\" --debug branch:feature/my-branch` or `tag:v4.0.0-stage`",
     "",
     "🔗 *Release table:* https://github.com/dayerdl/slack-bitrise-build-trigger/blob/main/data/client-releases.tsv",
     ""
@@ -147,7 +148,9 @@ export function formatCommandSummary(command) {
     .map(([key, value]) => `${key}=${value}`)
     .join(", ");
 
-  return `workflow=${command.workflow}, branch=${command.branch}, ${envSummary}`;
+  const refSummary = command.tag ? `tag=${command.tag}` : `branch=${command.branch}`;
+
+  return `workflow=${command.workflow}, ${refSummary}, ${envSummary}`;
 }
 
 const BITRISE_COMMIT_MESSAGE_MAX = 500;
@@ -207,7 +210,12 @@ function normalizeValue(value) {
 
 function validateCommand(fields, env, options) {
   requireValue(fields.workflow, "workflow");
-  requireValue(fields.branch, "branch");
+  if (fields.branch && fields.tag) {
+    throw new BuildCommandValidationError("Use either branch: or tag:, not both.");
+  }
+  if (!fields.branch && !fields.tag) {
+    throw new BuildCommandValidationError("Missing required parameter: branch or tag.");
+  }
   requireValue(env.build_env, "ENV[build_env]");
   requireValue(env.platform_account, "ENV[platform_account]");
 

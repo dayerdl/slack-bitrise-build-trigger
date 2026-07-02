@@ -15,6 +15,7 @@ export function buildQuickDeployConfirmationPayload({
   previousVersion,
   nextVersion,
   branch,
+  tag = null,
   confirmToken,
   commitMessage,
   buildDebug = false,
@@ -34,6 +35,9 @@ export function buildQuickDeployConfirmationPayload({
       : isWeb
         ? "\nPlatform: *web*"
         : "";
+  const refLine = tag
+    ? `Tag: \`${escapeMrkdwn(tag)}\``
+    : `Branch: \`${escapeMrkdwn(branch)}\``;
   return {
     response_type: "ephemeral",
     replace_original: false,
@@ -46,7 +50,7 @@ export function buildQuickDeployConfirmationPayload({
           text:
             `*Quick deploy* · ${escapeMrkdwn(platformSlug)} · *${escapeMrkdwn(buildEnv)}*\n` +
             `Latest in release table: \`${escapeMrkdwn(previousVersion)}\` → *${escapeMrkdwn(nextVersion)}*\n` +
-            `Branch: \`${escapeMrkdwn(branch)}\` · workflow: \`${workflow}\`` +
+            `${refLine} · workflow: \`${workflow}\`` +
             webLine +
             debugLine +
             messageLine,

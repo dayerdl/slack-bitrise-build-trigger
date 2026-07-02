@@ -37,6 +37,6 @@ export function resolveTsvClientForBuildCustomer(buildCustomer, buildCustomerMap
 
 export function formatReleaseNotesFromBuildCommand(command) {
   const w = command.workflow ?? "";
-  const b = command.branch ?? "";
-  return `Slack build — workflow:${w} branch:${b}`.trim();
+  const ref = command.tag ? `tag:${command.tag}` : `branch:${command.branch ?? ""}`;
+  return `Slack build — workflow:${w} ${ref}`.trim();
 }

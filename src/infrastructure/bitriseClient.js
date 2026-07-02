@@ -127,20 +127,28 @@ export function buildBitriseRequestBody(command) {
     String(command.actor?.userId ?? "").trim() ||
     "slack-build-iqc-vercel";
 
+  const tag = String(command.tag ?? "").trim();
+  const buildParams = {
+    workflow_id: resolveBitriseWorkflowId(command.workflow),
+    commit_message: formatBitriseTriggerMessage(command),
+    environments: Object.entries(env).map(([key, value]) => ({
+      mapped_to: key,
+      value,
+      is_expand: false,
+    })),
+  };
+
+  if (tag) {
+    buildParams.tag = tag;
+  } else {
+    buildParams.branch = command.branch;
+  }
+
   return {
     hook_info: {
       type: "bitrise",
     },
-    build_params: {
-      branch: command.branch,
-      workflow_id: resolveBitriseWorkflowId(command.workflow),
-      commit_message: formatBitriseTriggerMessage(command),
-      environments: Object.entries(env).map(([key, value]) => ({
-        mapped_to: key,
-        value,
-        is_expand: false,
-      })),
-    },
+    build_params: buildParams,
     triggered_by: actor,
   };
 }

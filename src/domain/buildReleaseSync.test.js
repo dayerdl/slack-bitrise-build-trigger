@@ -52,3 +52,14 @@ test("formatReleaseNotesFromBuildCommand includes workflow and branch", () => {
     "Slack build — workflow:deploy branch:master"
   );
 });
+
+test("formatReleaseNotesFromBuildCommand includes tag when set", () => {
+  assert.equal(
+    formatReleaseNotesFromBuildCommand({
+      workflow: "deployWebapp",
+      tag: "v4.0.0-stage",
+      env: {},
+    }),
+    "Slack build — workflow:deployWebapp tag:v4.0.0-stage"
+  );
+});

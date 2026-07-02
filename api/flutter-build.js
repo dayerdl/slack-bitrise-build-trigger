@@ -167,7 +167,8 @@ export async function POST(request) {
       }
 
       const defaultBranch = String(process.env.DEFAULT_SLACK_DEPLOY_BRANCH ?? "").trim() || "development";
-      const branch = String(intent.branch ?? "").trim() || defaultBranch;
+      const tag = String(intent.tag ?? "").trim();
+      const branch = tag ? null : String(intent.branch ?? "").trim() || defaultBranch;
       const isWebBuild = intent.buildPlatform === "web";
       let webHosting = null;
 
@@ -188,7 +189,7 @@ export async function POST(request) {
       const tokenPayload = {
         t: Date.now(),
         workflow: isWebBuild ? "deployWebapp" : "deployFromSlack",
-        branch,
+        ...(tag ? { tag } : { branch }),
         platform_account: canonical,
         build_env: intent.buildEnv,
         build_version: plan.nextVersion,
@@ -213,6 +214,7 @@ export async function POST(request) {
           previousVersion: plan.previousVersion,
           nextVersion: plan.nextVersion,
           branch,
+          tag,
           confirmToken,
           commitMessage: intent.commitMessage,
           buildDebug: intent.buildDebug,

@@ -36,3 +36,17 @@ test("buildCommandFromVerifiedQuickDeploy builds web deploy workflow", () => {
   assert.equal(command.env.aws_bucket_name, "webapp-macerich-stage");
   assert.equal(command.env.web_hosting_url, "stage.webapp.school-cents.com");
 });
+
+test("buildCommandFromVerifiedQuickDeploy uses tag instead of branch", () => {
+  const command = buildCommandFromVerifiedQuickDeploy({
+    workflow: "deployWebapp",
+    tag: "v4.0.0-stage",
+    platform_account: "balharbour",
+    build_env: "stage",
+    build_version: "4.0.1",
+    build_platform: "web",
+  });
+
+  assert.equal(command.tag, "v4.0.0-stage");
+  assert.equal(command.branch, null);
+});

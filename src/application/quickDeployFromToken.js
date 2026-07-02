@@ -4,7 +4,8 @@
  * @param {Record<string, unknown>} verified
  */
 export function buildCommandFromVerifiedQuickDeploy(verified) {
-  const branch = String(verified.branch ?? "").trim() || "development";
+  const tag = String(verified.tag ?? "").trim();
+  const branch = tag ? null : String(verified.branch ?? "").trim() || "development";
   const platform = String(verified.platform_account ?? "").trim().toLowerCase();
   const buildEnv = String(verified.build_env ?? "").trim().toLowerCase();
   const version = String(verified.build_version ?? "").trim();
@@ -44,6 +45,7 @@ export function buildCommandFromVerifiedQuickDeploy(verified) {
   return {
     workflow: String(verified.workflow ?? defaultWorkflow).trim() || defaultWorkflow,
     branch,
+    tag: tag || null,
     env,
   };
 }

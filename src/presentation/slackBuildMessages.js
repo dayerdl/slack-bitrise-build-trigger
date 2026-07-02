@@ -9,9 +9,13 @@ export function buildAcknowledgementPayload({ command, userId, userName }) {
   const env = command.env;
   const summaryLine = formatCommandSummary(command);
 
+  const refField = command.tag
+    ? { type: "mrkdwn", text: `*Tag*\n${command.tag}` }
+    : { type: "mrkdwn", text: `*Branch*\n${command.branch}` };
+
   const fields = [
     { type: "mrkdwn", text: `*Workflow*\n${command.workflow}` },
-    { type: "mrkdwn", text: `*Branch*\n${command.branch}` },
+    refField,
     { type: "mrkdwn", text: `*Env*\n${env.build_env ?? "—"}` },
     { type: "mrkdwn", text: `*Platform account*\n${env.platform_account ?? "—"}` },
   ];

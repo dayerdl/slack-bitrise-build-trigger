@@ -101,6 +101,7 @@ function tryParseQuickDeploy(normalized) {
 
   let buildDebug = false;
   let branch = null;
+  let tag = null;
   let buildPlatform = null;
   const messageParts = [];
   for (let i = 0; i < rest.length; i++) {
@@ -160,10 +161,39 @@ function tryParseQuickDeploy(normalized) {
       branch = value;
       continue;
     }
+    if (normalizedLower === "--tag") {
+      const next = String(rest[i + 1] ?? "").trim();
+      if (!next) {
+        return null;
+      }
+      tag = next;
+      i++;
+      continue;
+    }
+    if (normalizedLower.startsWith("--tag=")) {
+      const value = normalizedItem.slice("--tag=".length).trim();
+      if (!value) {
+        return null;
+      }
+      tag = value;
+      continue;
+    }
+    if (normalizedLower.startsWith("tag:")) {
+      const value = normalizedItem.slice("tag:".length).trim();
+      if (!value) {
+        return null;
+      }
+      tag = value;
+      continue;
+    }
     messageParts.push(normalizedItem);
   }
 
   if (messageParts.length > 1) {
+    return null;
+  }
+
+  if (branch && tag) {
     return null;
   }
 
@@ -174,6 +204,7 @@ function tryParseQuickDeploy(normalized) {
     commitMessage: messageParts[0] ? String(messageParts[0]).trim() : null,
     buildDebug,
     branch,
+    tag,
     buildPlatform,
   };
 }

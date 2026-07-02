@@ -58,6 +58,7 @@ test("quick deploy intent two words", () => {
     commitMessage: null,
     buildDebug: false,
     branch: null,
+    tag: null,
     buildPlatform: null,
   });
 });
@@ -70,6 +71,7 @@ test("quick deploy accepts optional quoted message (double quotes)", () => {
     commitMessage: "this is for testing PN",
     buildDebug: false,
     branch: null,
+    tag: null,
     buildPlatform: null,
   });
 });
@@ -82,6 +84,7 @@ test("quick deploy accepts optional quoted message (single quotes)", () => {
     commitMessage: "hello world",
     buildDebug: false,
     branch: null,
+    tag: null,
     buildPlatform: null,
   });
 });
@@ -94,6 +97,7 @@ test("quick deploy accepts debug flag", () => {
     commitMessage: null,
     buildDebug: true,
     branch: null,
+    tag: null,
     buildPlatform: null,
   });
 });
@@ -106,6 +110,7 @@ test("quick deploy accepts quoted message and debug flag in either order", () =>
     commitMessage: "testing PN",
     buildDebug: true,
     branch: null,
+    tag: null,
     buildPlatform: null,
   });
   assert.deepEqual(parseFlutterBuildIntent('moa stage --debug "testing PN"'), {
@@ -115,6 +120,7 @@ test("quick deploy accepts quoted message and debug flag in either order", () =>
     commitMessage: "testing PN",
     buildDebug: true,
     branch: null,
+    tag: null,
     buildPlatform: null,
   });
 });
@@ -127,6 +133,7 @@ test("quick deploy accepts optional branch parameter", () => {
     commitMessage: null,
     buildDebug: false,
     branch: "feature/my-branch",
+    tag: null,
     buildPlatform: null,
   });
 });
@@ -139,6 +146,7 @@ test("quick deploy accepts branch with message and debug flag", () => {
     commitMessage: "testing PN",
     buildDebug: true,
     branch: "feature/my-branch",
+    tag: null,
     buildPlatform: null,
   });
   assert.deepEqual(parseFlutterBuildIntent('moa stage --branch=feature/my-branch --debug "testing PN"'), {
@@ -148,6 +156,7 @@ test("quick deploy accepts branch with message and debug flag", () => {
     commitMessage: "testing PN",
     buildDebug: true,
     branch: "feature/my-branch",
+    tag: null,
     buildPlatform: null,
   });
 });
@@ -160,6 +169,7 @@ test("quick deploy accepts platform:web", () => {
     commitMessage: null,
     buildDebug: false,
     branch: null,
+    tag: null,
     buildPlatform: "web",
   });
 });
@@ -172,8 +182,49 @@ test("quick deploy accepts --platform web", () => {
     commitMessage: null,
     buildDebug: false,
     branch: null,
+    tag: null,
     buildPlatform: "web",
   });
+});
+
+test("quick deploy accepts optional tag parameter", () => {
+  assert.deepEqual(parseFlutterBuildIntent("moa stage tag:v4.0.0-stage"), {
+    type: "quick_deploy",
+    platformSlug: "moa",
+    buildEnv: "stage",
+    commitMessage: null,
+    buildDebug: false,
+    branch: null,
+    tag: "v4.0.0-stage",
+    buildPlatform: null,
+  });
+});
+
+test("quick deploy accepts tag with --tag flag", () => {
+  assert.deepEqual(parseFlutterBuildIntent("moa stage --tag v4.0.0-stage"), {
+    type: "quick_deploy",
+    platformSlug: "moa",
+    buildEnv: "stage",
+    commitMessage: null,
+    buildDebug: false,
+    branch: null,
+    tag: "v4.0.0-stage",
+    buildPlatform: null,
+  });
+  assert.deepEqual(parseFlutterBuildIntent("moa stage --tag=v4.0.0-stage"), {
+    type: "quick_deploy",
+    platformSlug: "moa",
+    buildEnv: "stage",
+    commitMessage: null,
+    buildDebug: false,
+    branch: null,
+    tag: "v4.0.0-stage",
+    buildPlatform: null,
+  });
+});
+
+test("quick deploy rejects branch and tag together", () => {
+  assert.equal(parseFlutterBuildIntent("moa stage branch:main tag:v1.0.0").type, "build");
 });
 
 test("quick deploy not matched when pipe form", () => {
