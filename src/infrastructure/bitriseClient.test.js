@@ -180,4 +180,8 @@ test("buildBitriseRequestBody sends tag instead of branch when tag is set", () =
 
   assert.equal(body.build_params.tag, "v4.0.0-stage");
   assert.equal(body.build_params.branch, undefined);
+  const env = Object.fromEntries(
+    body.build_params.environments.map((item) => [item.mapped_to, item.value])
+  );
+  assert.equal(env.slack_git_tag, "v4.0.0-stage");
 });

@@ -72,6 +72,11 @@ export function buildBitriseEnvironmentsForApi(command) {
     env.slack_triggered_by_user_name = actorUserName;
   }
 
+  const gitTag = String(command.tag ?? "").trim();
+  if (gitTag && !env.slack_git_tag) {
+    env.slack_git_tag = gitTag;
+  }
+
   const account = String(env.platform_account ?? "").trim();
   if (account) {
     env.platform_account = account;
