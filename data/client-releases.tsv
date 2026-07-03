@@ -25,6 +25,7 @@ Lillenium	2.9.728	2026-06-01	stage	bitrise	Slack build — workflow:deployFromSl
 Lillenium	2.9.727	2026-06-01	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Lillenium	2.9.726	2026-05-26	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Lillenium	2.9.724	2025-11-20	stage		app-3185 ionic→flutter reopened
+LIWA	0.0.21	2026-07-03	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 LIWA	0.0.20	2026-06-26	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 LIWA	0.0.19	2026-05-13	stage	bitrise	Slack build — workflow:deployFromSlack branch:liwa-flutter-app
 LIWA	0.0.18	2026-05-11	stage	bitrise	Slack build — workflow:deployFromSlack branch:liwa-flutter-app
