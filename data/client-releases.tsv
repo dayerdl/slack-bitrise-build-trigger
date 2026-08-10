@@ -124,6 +124,7 @@ Mall of America	4.2.353	2026-03-26	prod	not released yet	app-3477 regression pro
 Mall of America	4.2.351	2026-03-24	stage		app-3436 regression stage resolved
 Mall of America	4.2.326	2025-12-01	prod	released	app-3238 hotfix icons map
 Mall of America	4.2.317	2025-11-05	prod		
+Marques Avenue	2.10.33	2026-08-10	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-16-marques
 Marques Avenue	2.10.32	2026-08-07	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-16-marques
 Marques Avenue	2.10.31	2026-08-07	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-16-marques
 Marques Avenue	2.10.30	2026-08-06	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
