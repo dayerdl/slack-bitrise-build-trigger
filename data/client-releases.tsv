@@ -7,6 +7,7 @@ Bergen Town Centre	3.0.14	2025-11-19	stage
 Bergen Town Centre	3.0.13	2025-11-18	stage		
 Bergen Town Centre	3.0.12	2025-11-06	stage	internal review	single-tier TRP app-3146
 Bergen Town Centre	3.0.10	2025-10-16	stage	feedback	app-2841 regression 3.0.9 resolved
+Helsinki	2.9.811	2026-08-10	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Helsinki	2.9.810	2026-07-30	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Helsinki	2.9.805	2026-05-05	prod	bitrise	Slack build — workflow:deployFromSlack branch:development
 Helsinki	2.9.804	2025-11-27	prod	released	
