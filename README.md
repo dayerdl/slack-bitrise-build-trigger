@@ -77,7 +77,7 @@ Use `branch:` or `tag:` (not both). `deploy` is an alias for `deployFromSlack`.
 | `build_version` | `major.minor.patch` |
 | `build_ios` / `build_android` | `true` / `false` (defaults: iOS `true`, Android `true` in quick deploy) |
 | `build_debug` | `true` → debug Android build, skips iOS |
-| `android_output_type` | `apk`, `appbundle`, or `aab`. **Prod + Android** → both APK and AAB |
+| `android_output_type` | `apk`, `appbundle`, or `aab`. **Prod + Android** → both APK and AAB (both uploaded to Firebase App Distribution) |
 | `api_region` | `r02` for `.r02` API suffix |
 | `build_message` | Shown on the Bitrise build page (not a Bitrise env var) |
 
@@ -132,6 +132,49 @@ npm test
 Deploy: `npx vercel --prod` after setting production env vars (`npx vercel env add ...`).
 
 Signature verification requires a real Slack request or a tunnel for end-to-end tests.
+
+---
+
+## Uploading Bitrise workflow YAML (coniq_csa)
+
+This Slack backend does **not** store the Flutter app `bitrise.yml`. Live workflows for **coniq_csa** live in Bitrise app config. The working copy is:
+
+`/Users/dayerdl/coniq_csa/.cursor/bitrise.yaml`
+
+App slug: `4ba1c99f-5ac5-4202-b937-d6a4bd592dfb`
+
+### Upload (preferred)
+
+Use the Cursor skill helper (token from `~/.cursor/mcp.json` → Bitrise MCP):
+
+```bash
+python3 ~/.cursor/skills/bitrise-upload-yml/scripts/upload_bitrise_yml.py
+```
+
+Upload + trigger example (web):
+
+```bash
+python3 ~/.cursor/skills/bitrise-upload-yml/scripts/upload_bitrise_yml.py \
+  --trigger-workflow deployWebapp \
+  --branch releases/sprint-26-14-macerich \
+  --env build_env=stage \
+  --env platform_account=macerich \
+  --env build_version=0.0.23 \
+  --env build_platform=web
+```
+
+### API shape
+
+```http
+POST https://api.bitrise.io/v0.1/apps/{APP_SLUG}/bitrise.yml
+Content-Type: application/json
+
+{"app_config_datastore_yaml": "<full yaml>"}
+```
+
+Prefer this REST call over MCP `update_bitrise_yml` for large YAML files (~75KB), which can hang.
+
+Agent skill: `bitrise-upload-yml` (`~/.cursor/skills/bitrise-upload-yml/`).
 
 ---
 
