@@ -196,7 +196,7 @@ One-time setup (per Play developer account / app):
 3. Skip optional GCP roles → **Done**.
 4. Open the service account → **Keys → Add key → Create new key → JSON** → download the file.
 5. Open [Google Play Console](https://play.google.com/console/) → **Users and permissions → Invite new users**.
-6. Paste the service account email (`…@….iam.gserviceaccount.com`).
+6. Paste the service account email (Sandbox Springs prod example: `bitrise@sandbox-springs-prod.iam.gserviceaccount.com`).
 7. Grant **app access** for the target package (e.g. `com.coniq.sandboxsprings`) with release / publish permissions (enough to upload to Internal testing).
 8. Send / accept the invite so the account shows as **Active**.
 
