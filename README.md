@@ -77,7 +77,7 @@ Use `branch:` or `tag:` (not both). `deploy` is an alias for `deployFromSlack`.
 | `build_version` | `major.minor.patch` |
 | `build_ios` / `build_android` | `true` / `false` (defaults: iOS `true`, Android `true` in quick deploy) |
 | `build_debug` | `true` → debug Android build, skips iOS |
-| `android_output_type` | `apk`, `appbundle`, or `aab`. **Prod + Android** → both APK and AAB (both uploaded to Firebase App Distribution) |
+| `android_output_type` | `apk`, `appbundle`, or `aab`. **Prod + Android** → both APK and AAB (APK → Firebase App Distribution; AAB → Google Play Internal Testing) |
 | `api_region` | `r02` for `.r02` API suffix |
 | `build_message` | Shown on the Bitrise build page (not a Bitrise env var) |
 
@@ -175,6 +175,66 @@ Content-Type: application/json
 Prefer this REST call over MCP `update_bitrise_yml` for large YAML files (~75KB), which can hang.
 
 Agent skill: `bitrise-upload-yml` (`~/.cursor/skills/bitrise-upload-yml/`).
+
+---
+
+## Google Play Internal Testing (prod AAB from Bitrise)
+
+On **prod** Android builds (`ANDROID_BUILD_BOTH=true`), `deployFromSlack` uploads:
+
+| Artifact | Destination |
+|----------|-------------|
+| APK | Firebase App Distribution |
+| AAB | Google Play **Internal testing** |
+
+One-time setup (per Play developer account / app):
+
+### 1. Create a service account and grant publish permissions
+
+1. Open [Google Cloud Console](https://console.cloud.google.com/) for the project linked to Play (e.g. Sandbox Springs prod).
+2. **IAM & Admin → Service Accounts → Create service account** (name e.g. `bitrise-play-upload`).
+3. Skip optional GCP roles → **Done**.
+4. Open the service account → **Keys → Add key → Create new key → JSON** → download the file.
+5. Open [Google Play Console](https://play.google.com/console/) → **Users and permissions → Invite new users**.
+6. Paste the service account email (`…@….iam.gserviceaccount.com`).
+7. Grant **app access** for the target package (e.g. `com.coniq.sandboxsprings`) with release / publish permissions (enough to upload to Internal testing).
+8. Send / accept the invite so the account shows as **Active**.
+
+### 2. Upload one build to Internal testing manually
+
+Google Play API rejects automated uploads until the app has at least one binary in Play Console.
+
+1. Play Console → select the app (`com.coniq.sandboxsprings`).
+2. **Test and release → Internal testing**.
+3. Create a release and upload an AAB (e.g. from a Bitrise Artifacts download) once.
+4. Save the release (draft or completed is fine for unlocking the API).
+
+Until this exists, Bitrise/Firebase may report errors such as *This app is not published in the Google Play console*.
+
+### 3. Enable Google Play Android Developer API
+
+1. In Google Cloud Console (same project as the service account): **APIs & Services → Library**.
+2. Search **Google Play Android Developer API**.
+3. **Enable** it.
+4. In Play Console → **Setup → API access** (or linked API project): confirm the Cloud project is linked and the service account appears with access.
+
+### 4. Add the JSON key to Bitrise
+
+1. Bitrise app **coniq_csa** → **Code signing & files** (Files) → **Add file**.
+2. Upload the service account JSON.
+3. **File Storage ID:** `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_KEY`  
+   (Bitrise exposes `$BITRISEIO_GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_KEY_URL`).
+4. Save. Re-run a prod Android build (`apk+aab`).
+
+The workflow step **Upload AAB to Google Play Internal Testing** downloads that key and runs `fastlane supply` with `--track internal`.
+
+### Where to see the AAB
+
+| Place | What you get |
+|-------|----------------|
+| Play Console → Internal testing | AAB release for testers |
+| Bitrise → Build → Artifacts | Raw `.aab` download |
+| Firebase App Distribution | APK only (not the AAB) |
 
 ---
 
