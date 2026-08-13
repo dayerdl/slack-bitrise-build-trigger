@@ -204,6 +204,14 @@ test("parses tag instead of branch in full command", () => {
   assert.ok(formatCommandSummary(command).includes("tag=v4.0.0-stage"));
 });
 
+test("strips origin/ prefix from branch in full command", () => {
+  const command = parseBuildCommand(
+    "workflow:deploy | branch:origin/releases/sprint-26-14-helsinki | ENV[build_env]:stage | ENV[platform_account]:helsinki | ENV[build_version]:1.0.0"
+  );
+
+  assert.equal(command.branch, "releases/sprint-26-14-helsinki");
+});
+
 test("rejects branch and tag together", () => {
   assert.throws(
     () =>

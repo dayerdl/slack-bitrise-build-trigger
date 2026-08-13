@@ -125,6 +125,26 @@ test("quick deploy accepts quoted message and debug flag in either order", () =>
   });
 });
 
+test("quick deploy strips origin/ from branch names", () => {
+  assert.deepEqual(
+    parseFlutterBuildIntent("helsinki stage branch:origin/releases/sprint-26-14-helsinki"),
+    {
+      type: "quick_deploy",
+      platformSlug: "helsinki",
+      buildEnv: "stage",
+      commitMessage: null,
+      buildDebug: false,
+      branch: "releases/sprint-26-14-helsinki",
+      tag: null,
+      buildPlatform: null,
+    }
+  );
+  assert.equal(
+    parseFlutterBuildIntent("moa stage --branch=origin/feature/my-branch").branch,
+    "feature/my-branch"
+  );
+});
+
 test("quick deploy accepts optional branch parameter", () => {
   assert.deepEqual(parseFlutterBuildIntent("moa stage branch:feature/my-branch"), {
     type: "quick_deploy",

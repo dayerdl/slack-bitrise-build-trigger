@@ -1,4 +1,5 @@
 import { isValidBuildEnv } from "./buildCommand.js";
+import { normalizeGitBranch } from "./gitRef.js";
 
 const LIST_KEYWORDS = new Set(["list", "clients", "versions"]);
 
@@ -203,7 +204,7 @@ function tryParseQuickDeploy(normalized) {
     buildEnv: envLower,
     commitMessage: messageParts[0] ? String(messageParts[0]).trim() : null,
     buildDebug,
-    branch,
+    branch: branch ? normalizeGitBranch(branch) : null,
     tag,
     buildPlatform,
   };

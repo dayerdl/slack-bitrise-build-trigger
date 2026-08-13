@@ -4,6 +4,7 @@ import {
   resolveWebHostingConfig,
   WebHostingConfigError,
 } from "./clientWebHosting.js";
+import { normalizeGitBranch } from "./gitRef.js";
 
 const VALID_BUILD_ENVS = new Set(["qa", "pre", "stage", "prod"]);
 const BOOLEAN_ENV_KEYS = new Set(["build_ios", "build_android", "build_debug"]);
@@ -84,7 +85,7 @@ export function parseBuildCommand(input, options = {}) {
 
   return {
     workflow: fields.workflow,
-    branch: fields.branch || null,
+    branch: fields.branch ? normalizeGitBranch(fields.branch) : null,
     tag: fields.tag || null,
     env,
   };

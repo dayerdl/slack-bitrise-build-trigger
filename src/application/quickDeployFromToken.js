@@ -1,3 +1,5 @@
+import { normalizeGitBranch } from "../domain/gitRef.js";
+
 /**
  * Rebuild a parsed Bitrise command from a verified quick-deploy confirmation token.
  *
@@ -5,7 +7,9 @@
  */
 export function buildCommandFromVerifiedQuickDeploy(verified) {
   const tag = String(verified.tag ?? "").trim();
-  const branch = tag ? null : String(verified.branch ?? "").trim() || "development";
+  const branch = tag
+    ? null
+    : normalizeGitBranch(String(verified.branch ?? "").trim() || "development");
   const platform = String(verified.platform_account ?? "").trim().toLowerCase();
   const buildEnv = String(verified.build_env ?? "").trim().toLowerCase();
   const version = String(verified.build_version ?? "").trim();
