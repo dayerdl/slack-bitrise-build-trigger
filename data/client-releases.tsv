@@ -20,6 +20,7 @@ Helsinki	2.9.804	2025-11-27	prod	released
 Helsinki	2.9.803	2025-11-13	stage		app-3165 stage final approval resolved
 Helsinki	2.9.802	2025-11-12	stage	internal review	final pre-launch
 Helsinki	2.9.801	2025-10-24	prod	pre-launch	app-3165; core branding
+LDO / One Wembley Park	2.10.20	2026-09-17	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-17-batavia-owp
 LDO / One Wembley Park	2.10.19	2026-09-16	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-17-batavia-owp
 LDO / One Wembley Park	2.10.18	2026-09-15	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-17-batavia-owp
 LDO / One Wembley Park	2.10.17	2026-09-10	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-17-batavia-owp
