@@ -99,6 +99,7 @@ Macerich	0.0.5	2026-06-18	stage	bitrise	Slack build — workflow:deployFromSlack
 Macerich	0.0.4	2026-06-16	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Macerich	0.0.3	2026-06-16	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
 Macerich	0.0.2	2026-06-11	stage	bitrise	Slack build — workflow:deployFromSlack branch:development
+Mall of America	4.3.386	2026-09-17	stage	bitrise	Slack build — workflow:deployFromSlack branch:APP-3781-digital-coupon-book
 Mall of America	4.3.385	2026-09-16	stage	bitrise	Slack build — workflow:deployFromSlack branch:APP-3781-digital-coupon-book
 Mall of America	4.3.382	2026-08-14	pre	bitrise	Slack build — workflow:deployFromSlack branch:development
 Mall of America	4.3.381	2026-08-12	stage	bitrise	Slack build — workflow:deployFromSlack branch:releases/sprint-26-16-moa
